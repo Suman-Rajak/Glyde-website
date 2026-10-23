@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy policy · Glyde</title>
+  <meta name="description" content="What Glyde, the voice island for Windows, keeps on your PC, what it sends online and to whom, and what this website keeps.">
+  <meta name="theme-color" content="#e9e2ff">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* The policy: one column of reading, on the site's paper, under a plain bar with the brand. */
+    .policy-bar { display: flex; align-items: center; justify-content: space-between; max-width: 760px; margin: 0 auto; padding: 22px var(--gutter); }
+    .policy { max-width: 760px; margin: 0 auto; padding: 24px var(--gutter) 80px; }
+    .policy h1 { font-size: clamp(40px, 6vw, 60px); margin: 18px 0 10px; }
+    .policy h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; }
+    .policy .updated { color: var(--ink-3); font-size: 14px; }
+    .policy .summary { margin: 30px 0 8px; padding: 20px 24px; border-radius: 18px; background: #fff; box-shadow: var(--shadow-soft); }
+    .policy .summary p + p { margin-top: 8px; }
+    .policy h2 { font-size: 24px; letter-spacing: -.02em; margin: 44px 0 12px; }
+    .policy h3 { font-size: 17px; letter-spacing: -.01em; margin: 26px 0 8px; }
+    .policy p, .policy li { color: var(--ink-2); }
+    .policy p + p { margin-top: 12px; }
+    .policy ul { margin: 10px 0 0; padding-left: 20px; }
+    .policy li + li { margin-top: 8px; }
+    .policy strong { color: var(--ink); font-weight: 600; }
+    .policy a { color: var(--ink); text-underline-offset: 3px; }
+    .policy table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 15px; }
+    .policy th, .policy td { text-align: left; vertical-align: top; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+    .policy th { color: var(--ink); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+    @media (max-width: 560px) { .policy table, .policy thead, .policy tbody, .policy tr, .policy th, .policy td { display: block; } .policy thead { display: none; } .policy td { border: 0; padding: 2px 0; } .policy tr { padding: 12px 0; border-bottom: 1px solid var(--line); } .policy td:first-child { color: var(--ink); font-weight: 600; } }
+  </style>
+</head>
+<body>
+  <header class="policy-bar">
+    <a class="brand" href="./">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Glyde</span>
+    </a>
+    <a class="btn btn-dark btn-sm" href="./">Back to Glyde</a>
+  </header>
+
+  <main class="policy">
+    <h1>Privacy <em>policy</em></h1>
+    <p class="updated">Last updated 23 October 2026. This covers the Glyde app for Windows, Glyde Cloud (its server for Glyde AI), and this website.</p>
+
+    <div class="summary">
+      <p><strong>In short.</strong> Glyde works on your PC. Your voice is turned into text on your PC, and what Glyde reads there (your clipboard, notifications, calendar, camera) stays there.</p>
+      <p>A few things go online, only when you use the feature that needs them, and each is listed below. Glyde has no ads, no analytics and no tracking, and we never sell anything about you.</p>
+    </div>
+
+    <h2>What stays on your PC</h2>
+    <ul>
+      <li><strong>Your voice.</strong> When you talk to Glyde, what you say is turned into text on your PC by OpenAI's Whisper model, which Glyde downloads once from Hugging Face. The recording isn't kept. With "Hey Glyde" on, the microphone listens for those words on your PC, and nothing it hears is kept.</li>
+      <li><strong>Your camera.</strong> The Prompter tab's mirror shows your camera live while you have it on. It's never recorded, kept or sent.</li>
+      <li><strong>What you copy.</strong> The clipboard history is kept in memory. Only what you choose to save is written to your PC.</li>
+      <li><strong>Notifications and calls</strong> from other apps, shown on the island. Glyde's activity log notes who they're from, never what they say.</li>
+      <li><strong>Your calendar</strong>, read only, from the Windows calendar, for your next meeting.</li>
+      <li><strong>What you ask Glyde to remember</strong>, your timers, alarms and reminders, files on the shelf, your teleprompter script, your settings and the activity log. All of it is in Glyde's own folder on your PC, and you can clear it from Settings.</li>
+      <li><strong>Your coding agents' sessions</strong> (Claude Code and Codex). They're passed to Glyde on your own PC (127.0.0.1) and kept in memory only.</li>
+    </ul>
+
+    <h2>What goes online, and to whom</h2>
+    <p>Only when you use the feature, and only what's needed for it:</p>
+    <table>
+      <thead><tr><th>Feature</th><th>What's sent</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td>Glyde AI's answers (subscription)</td><td>The request Glyde couldn't handle on your PC, with what you've asked it to remember</td><td>Glyde Cloud, then Anthropic (Claude). Anthropic doesn't use it to train models.</td></tr>
+        <tr><td>Places, news and searches in an answer</td><td>The place or the subject</td><td>MET Norway (weather), Google News, Wikipedia</td></tr>
+        <tr><td>Pictures under answers</td><td>The subject's name</td><td>Wikipedia and Wikidata</td></tr>
+        <tr><td>Instant hearing (Glyde AI)</td><td>Your voice, streamed while you speak a request</td><td>Deepgram, straight from the app, with a short-lived pass from Glyde Cloud</td></tr>
+        <tr><td>Natural voice (Glyde AI)</td><td>What Glyde says back to you</td><td>Microsoft Azure AI Speech, straight from the app, with a short-lived pass from Glyde Cloud</td></tr>
+        <tr><td>The weather where you are</td><td>Your location, rounded to about a kilometre, at most every half hour</td><td>MET Norway; OpenStreetMap for the place's name</td></tr>
+        <tr><td>The weather for a city</td><td>The city's name, once, then its location</td><td>Open-Meteo, then MET Norway</td></tr>
+        <tr><td>Album art</td><td>The song's title and artist</td><td>iTunes, MusicBrainz and YouTube</td></tr>
+        <tr><td>Lyrics</td><td>The song's title, artist and length</td><td>LRCLIB</td></tr>
+        <tr><td>Live scores</td><td>Nothing about you</td><td>ESPN's public scoreboard</td></tr>
+        <tr><td>The speech model</td><td>A download, once</td><td>Hugging Face</td></tr>
+      </tbody>
+    </table>
+    <p>Settings › Permissions in the app shows each of these, whether it's on, and where to turn it off.</p>
+
+    <h3>Glyde Cloud</h3>
+    <p>Glyde AI runs through Glyde Cloud, our own server. It checks with the Microsoft Store that your account has Glyde Pro and Glyde AI, then passes your requests on to Anthropic, and gives the app short-lived passes for Deepgram and Microsoft. <strong>It keeps no record of what you ask.</strong> It does count how much each install uses each day, to keep everyone to a fair share. That count is kept under a random ID made by the app and a stand-in for your purchase, never your name or email.</p>
+
+    <h3>Purchases</h3>
+    <p>Glyde Pro and Glyde AI are bought through the Microsoft Store, which handles payment under Microsoft's own privacy statement. Your payment details never reach us.</p>
+
+    <h3>What the app asks Windows for</h3>
+    <p>Notifications, the microphone, the calendar, location and the camera. Windows asks you first, and Glyde's welcome explains why before it does. You can say no to any of them, or change them later in Windows Settings › Privacy &amp; security.</p>
+
+    <h2>This website</h2>
+    <p>If you join the waitlist, we keep your email address, which form you used, and your time zone and language, in a Google Sheet only we can see. It's used to send you a welcome email and to tell you when Glyde launches. Emails are sent through Brevo or Gmail. Ask us and we'll delete your address.</p>
+    <p>The site loads its fonts from Google Fonts. It sets no cookies and runs no analytics; the only thing it remembers, for that visit, is whether you closed its download bar.</p>
+
+    <h2>Children</h2>
+    <p>Glyde isn't made for children under 13, and we don't knowingly collect anything from them.</p>
+
+    <h2>Changes, and getting in touch</h2>
+    <p>If this policy changes, the new one will be here, with its date at the top. For any question, or to have your waitlist email deleted, write to <a href="mailto:rajaksuman670@gmail.com">rajaksuman670@gmail.com</a>.</p>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">Glyde</span></a>
+      <nav aria-label="Footer">
+        <a href="./#features">Features</a>
+        <a href="./#privacy">Privacy</a>
+        <a href="./#pricing">Pricing</a>
+        <a href="./#faq">FAQ</a>
+      </nav>
+      <p class="fine">© 2026 Glyde. An independent app, not affiliated with Apple Inc., Microsoft Corporation or Google LLC.</p>
+    </div>
+  </footer>
+</body>
+</html>
