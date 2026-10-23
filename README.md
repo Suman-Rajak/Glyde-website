@@ -8,7 +8,8 @@ index.html    the page
 styles.css    the look (the sky, the glass, every island view)
 island.js     the island: shapes, spring animation and views copied from the app
 main.js       the page's demos, navigation island, voice demos, waitlist and pricing
-favicon.svg
+logo.png      the app's logo (the ghost on its violet tile), for the top bar and the dock
+favicon.png, apple-touch-icon.png   the tab's and a phone's icon, from the same logo
 apps-script/   the Google Sheets waitlist backend (Code.gs) and its setup guide
 ```
 

@@ -62,6 +62,13 @@
     mail: stroke('<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/>'),
     chat: stroke('<path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 9 19.2l-4.5.3z"/>'),
     translate: stroke('<path d="M3.5 5.5h9M8 3.5v2M10.5 5.5c-.8 3.8-3.4 6.6-6.5 8M6 9c1.2 2 3 3.5 5 4.5"/><path d="M13 20.5l3.8-9 3.7 9M14.3 17.5h5"/>'),
+    phone: stroke('<path d="M6.6 3.5h2.6l1.4 4.2-2 1.4a11.5 11.5 0 0 0 6.3 6.3l1.4-2 4.2 1.4v2.6a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/>'),
+    calendar: stroke('<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
+    code: stroke('<rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="m7.5 10 2.5 2.5-2.5 2.5M12.5 15.5h4"/>'),
+    search: stroke('<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>'),
+    split: stroke('<rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="M12 4.5v15"/>'),
+    trophy: stroke('<path d="M7.5 4h9v5a4.5 4.5 0 0 1-9 0V4z"/><path d="M7.5 6H4.5a3 3 0 0 0 3 4M16.5 6h3a3 3 0 0 1-3 4M12 13.5V17M8.5 20.5h7M9.5 17h5v3.5h-5z"/>'),
+    menu: stroke('<rect x="2.5" y="4" width="19" height="16" rx="3"/><path d="M2.5 8.5h19M6 6.3h.01M8.5 6.3h3"/>'),
   };
 
   function batteryIcon(percent, color) {

@@ -188,24 +188,12 @@ main, .footer { position: relative; z-index: 1; }
   transition: color .4s;
 }
 .brand-mark {
-  position: relative;
   width: 30px;
-  height: 14px;
-  border-radius: 7px;
-  background: linear-gradient(180deg, #2a2d45, #0d0f1e);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 0 1px rgba(255, 255, 255, .5), 0 0 18px rgba(242, 181, 68, .7);
-}
-.brand-mark::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: -9px;
-  width: 22px;
-  height: 6px;
-  translate: -50% 0;
-  border-radius: 50%;
-  border: 1.6px solid var(--gold);
-  box-shadow: 0 0 8px var(--gold-2);
+  height: 30px;
+  flex: none;
+  border-radius: 9px;
+  background: url("logo.png") center / cover no-repeat;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .35), 0 6px 18px -6px rgba(90, 60, 255, .7);
 }
 
 .nav-island {
@@ -1228,7 +1216,7 @@ kbd {
 .currency button { height: 34px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; font-size: 13.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; transition: background .3s, color .3s, box-shadow .3s; }
 .currency button[aria-checked="true"] { background: #fff; color: var(--ink); box-shadow: 0 4px 12px -6px rgba(40, 50, 120, .4); }
 
-.plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: stretch; max-width: 840px; margin: 56px auto 0; }
+.plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: stretch; max-width: 1180px; margin: 56px auto 0; }
 .plan {
   position: relative;
   display: flex;
@@ -1279,7 +1267,38 @@ kbd {
 .plan.pro .btn-glow { background: linear-gradient(180deg, #ffe2a0, #f2b544); color: #2b1d02; box-shadow: 0 10px 30px -10px rgba(242, 181, 68, .9), inset 0 1px 0 rgba(255, 255, 255, .6); }
 .plan-badge { position: absolute; top: 22px; right: 22px; padding: 5px 11px; border-radius: 999px; background: linear-gradient(140deg, var(--gold-2), var(--gold)); color: #2b1d02; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
 .plan-badge.soft { background: rgba(13, 16, 36, .07); color: var(--ink-2); }
+/* Glyde AI: Pro's dark glass, in cyan. */
+.plan.ai { background: linear-gradient(180deg, #0f2230, #08121b); color: #fff; box-shadow: 0 30px 70px -30px rgba(10, 60, 90, .7), 0 0 60px -20px rgba(80, 220, 255, .45), inset 0 0 0 1px rgba(142, 240, 255, .35); }
+.plan.ai .plan-for, .plan.ai li { color: rgba(255, 255, 255, .72); }
+.plan.ai .price span { color: rgba(255, 255, 255, .5); }
+.plan.ai .price b { background: linear-gradient(100deg, #fff, #9ef3ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.plan.ai li::before { background-color: rgba(142, 240, 255, .16); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238ef0ff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E"); }
+.plan.ai .btn-ghost { background: rgba(142, 240, 255, .12); color: #dffbff; box-shadow: inset 0 0 0 1px rgba(142, 240, 255, .45); }
+.plan.ai .btn-ghost:hover { background: rgba(142, 240, 255, .22); }
+.plan-badge.ai { background: linear-gradient(140deg, #c9f8ff, #5fd8f0); color: #04232b; }
 .plans-note { max-width: 640px; margin: 30px auto 0; text-align: center; font-size: 14px; color: var(--ink-3); }
+
+/* ---------- And there's more ---------- */
+
+.more { max-width: 1180px; margin: 96px auto 0; }
+.more-title { text-align: center; font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -.03em; }
+.more-title em { font-family: var(--serif); font-style: italic; font-weight: 400; }
+.more-grid { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.more-grid li {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  column-gap: 14px;
+  row-gap: 3px;
+  align-content: start;
+  padding: 20px 22px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .86), rgba(255, 255, 255, .56));
+  box-shadow: inset 0 0 0 1px #fff, var(--shadow-soft);
+}
+.more-ic { grid-row: span 2; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: rgba(13, 16, 36, .06); color: var(--ink); }
+.more-ic svg { width: 20px; height: 20px; }
+.more-grid b { font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+.more-grid p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
 
 /* ---------- FAQ ---------- */
 
@@ -1712,8 +1731,7 @@ html.launched .prelaunch-only { display: none; }
 }
 .dock[hidden] { display: none; }
 .dock.show { transform: translate(-50%, 0); opacity: 1; }
-.dock-mark { position: relative; flex: none; width: 26px; height: 12px; margin-top: 6px; border-radius: 6px; background: #2a2d45; box-shadow: 0 0 0 1px rgba(255, 255, 255, .4), 0 0 12px rgba(242, 181, 68, .8); }
-.dock-mark::after { content: ''; position: absolute; left: 50%; top: -8px; width: 18px; height: 5px; translate: -50% 0; border-radius: 50%; border: 1.4px solid var(--gold); }
+.dock-mark { flex: none; width: 30px; height: 30px; border-radius: 9px; background: url("logo.png") center / cover no-repeat; box-shadow: 0 0 0 1px rgba(255, 255, 255, .3), 0 0 14px rgba(120, 90, 255, .6); }
 .dock-text b { display: block; font-size: 14px; line-height: 1.2; }
 .dock-text small { display: block; font-size: 11.5px; color: rgba(255, 255, 255, .6); white-space: nowrap; }
 .dock .btn { height: 40px; }
@@ -1739,6 +1757,7 @@ html.launched .prelaunch-only { display: none; }
 @media (max-width: 1000px) {
   .facts, .privacy-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .plans { grid-template-columns: minmax(0, 1fr); max-width: 520px; }
+  .more-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .music-grid { grid-template-columns: minmax(0, 1fr); }
   .music-copy { text-align: center; }
   .music-copy .lede { margin-inline: auto; max-width: 560px; }
@@ -1756,6 +1775,7 @@ html.launched .prelaunch-only { display: none; }
 }
 
 @media (max-width: 640px) {
+  .more-grid { grid-template-columns: minmax(0, 1fr); }
   .brand-name { display: none; }
   .btn-sm .long { display: none; }
   .btn-sm .short { display: inline; }

@@ -60,6 +60,7 @@
     $$('[data-cta]').forEach(a => { a.innerHTML = '<span class="long">Download</span><span class="short">Get</span>'; });
     $$('[data-plan="free"]').forEach(a => { a.textContent = 'Download free'; a.href = best; });
     $$('[data-plan="pro"]').forEach(a => { a.innerHTML = '<span>Get Pro</span>'; a.href = CONFIG.storeUrl || best; });
+    $$('[data-plan="ai"]').forEach(a => { a.textContent = 'Get Glyde AI with Pro'; a.href = CONFIG.storeUrl || best; });
   }
 
   // ---- Content shared by several islands ---------------------------------------------------
