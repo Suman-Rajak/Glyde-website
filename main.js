@@ -94,7 +94,7 @@
   const siroScript = (heard, reply, effect) => async ({ show, wait }) => {
     show(V.siroListening(heard));
     if (!await wait(1800)) return;
-    show(V.siroThinking());
+    show(V.siroThinking(heard));
     if (!await wait(600)) return;
     const text = typeof reply === 'function' ? reply() : reply;
     show(V.siroAnswer(heard, text));
@@ -574,7 +574,7 @@
   const drafted = (heard, draft, opened) => async ({ show, wait, director }) => {
     show(V.siroListening(heard));
     if (!await wait(1900)) return;
-    show(V.siroThinking());
+    show(V.siroThinking(heard));
     if (!await wait(900)) return;
     director.opened = opened;
     show(V.siroDraft(draft));
@@ -583,7 +583,7 @@
   const answered = (heard, reply) => async ({ show, wait }) => {
     show(V.siroListening(heard));
     if (!await wait(1800)) return;
-    show(V.siroThinking());
+    show(V.siroThinking(heard));
     if (!await wait(900)) return;
     show(V.siroAnswer(heard, reply));
     await wait(reply.length > 60 ? 4800 : 3200);

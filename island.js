@@ -172,6 +172,129 @@
     snap() { this.x = this.target; this.v = 0; }
   }
 
+  // ---- The listening waves -------------------------------------------------------------------
+  // The app's own (Activities/ListeningWave.cs), with its numbers, drawn the same way on a canvas: three glowing
+  // strands, each a bright thin line inside wider, fainter copies of itself (the glow), rippling along at their own
+  // lengths and speeds and crossing as they go, pinched together and fading at both ends. With the voice they rise into
+  // taller waves, brighten and run faster. They roll out from the middle as listening starts, and take the thinking
+  // colours, low and slowly swelling, while Glyde works out what was said.
+
+  const WAVE = { span: 156, height: 36, margin: 8, stillLevel: 0.45, stillTurn: 0.1 };
+  // Each strand: its wavelength, the ms to move one wavelength (less than 0, the other way), where its wave starts, how
+  // tall it is at rest and how much taller with the voice, and its layers, widest first: [thickness, opacity, is the core].
+  const STRANDS = [
+    { wavelength: 70, period: 1500, shift: 0, rest: 1.0, rise: 8, layers: [[13, 0.08, false], [7, 0.2, false], [3.6, 0.45, false], [1.6, 1, true]] },
+    { wavelength: 48, period: 1100, shift: 1.9, rest: 0.8, rise: 6, layers: [[5, 0.22, false], [1.3, 0.85, true]] },
+    { wavelength: 90, period: -2100, shift: 4.0, rest: 0.6, rise: 5, layers: [[5, 0.2, false], [1.2, 0.75, true]] },
+  ];
+  // Each strand's colours, [at its ends, its glow, its core]: aqua, sky and periwinkle while listening; orchid, violet
+  // and rose while thinking.
+  const WAVE_LISTENING = [['#3F5BFF', '#45D9F0', '#E6FCFF'], ['#4660FF', '#5EC4FF', '#B8E6FF'], ['#5A5CFF', '#7B8CFF', '#C4CCFF']].map(s => s.map(hex));
+  const WAVE_THINKING = [['#6A4CFF', '#D66BFF', '#F6E6FF'], ['#7B5CFF', '#A87CFF', '#E2D2FF'], ['#8A4CD8', '#EC7AB8', '#FFD6EC']].map(s => s.map(hex));
+  // All the glows first (widest first), then the cores, so the bright lines stay crisp where the strands cross.
+  const WAVE_LAYERS = STRANDS
+    .flatMap((strand, i) => strand.layers.map(([thickness, opacity, core], depth) => ({ strand: i, thickness, opacity, core, order: core ? 99 : depth })))
+    .sort((a, b) => a.order - b.order);
+
+  // A strand's curve: a sine wave across the span, pinched to nothing at the ends, its wave `turn` of the way round.
+  function waveCurve(strand, turn, level) {
+    const { span, height, margin } = WAVE;
+    const tall = strand.rest + strand.rise * level;
+    const k = 2 * Math.PI / strand.wavelength;
+    const phase = 2 * Math.PI * turn + strand.shift;
+    const path = new Path2D();
+    for (let i = 0; i <= 72; i++) {
+      const x = margin + span * i / 72;
+      const u = 2 * (x - margin) / span - 1;
+      const y = height / 2 + tall * (1 - u * u) * (1 - u * u) * Math.sin(k * x + phase);
+      if (i) path.lineTo(x, y); else path.moveTo(x, y);
+    }
+    return path;
+  }
+
+  /**
+   * Draws the waves on a canvas until it's off the page. 'live' follows voice.level (quick to rise, a little slower to
+   * settle) and rolls out from the middle; 'resting' (thinking) blends into the thinking colours and swells low and
+   * slow. With reduced motion, still waves, part risen. Returns a function that stops it.
+   */
+  function mountWaves(canvas, mode = 'live') {
+    const { span, height, margin } = WAVE;
+    const width = span + 2 * margin;
+    const ratio = Math.min(4, (window.devicePixelRatio || 1) * 2); // (crisp in an island scaled up on the page)
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    const ctx = canvas.getContext('2d');
+    const resting = mode === 'resting';
+    const turns = STRANDS.map(() => WAVE.stillTurn);
+    const started = performance.now();
+    let level = resting ? 0.05 : 0;
+    let aim = 0;
+    let sampled = 0;
+    let last = started;
+    let raf = 0;
+
+    const draw = (reveal, tint) => {
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+      ctx.translate(width / 2, 0);
+      ctx.scale(Math.max(0.001, reveal), 1);
+      ctx.translate(-width / 2, 0);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      const shown = Math.min(1, reveal * 1.5);
+      const curves = STRANDS.map((strand, i) => waveCurve(strand, turns[i], level));
+      for (const layer of WAVE_LAYERS) {
+        const colour = n => WAVE_LISTENING[layer.strand][n].map((v, c) => Math.round(v + (WAVE_THINKING[layer.strand][n][c] - v) * tint)).join(',');
+        const middle = colour(layer.core ? 2 : 1);
+        const gradient = ctx.createLinearGradient(margin, 0, margin + span, 0);
+        gradient.addColorStop(0, `rgba(${colour(0)},0)`);
+        gradient.addColorStop(0.22, `rgb(${middle})`);
+        gradient.addColorStop(0.78, `rgb(${middle})`);
+        gradient.addColorStop(1, `rgba(${colour(0)},0)`);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = layer.thickness;
+        ctx.globalAlpha = shown * layer.opacity * (layer.core ? 0.75 + 0.25 * level : 0.45 + 0.55 * level);
+        ctx.stroke(curves[layer.strand]);
+      }
+    };
+
+    if (reduceMotion) {
+      level = WAVE.stillLevel;
+      draw(1, resting ? 1 : 0);
+      return () => {};
+    }
+
+    const frame = now => {
+      if (!canvas.isConnected) return;
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      const age = (now - started) / 1000;
+      let pace;
+      if (resting) {
+        // A low, slow swell: 0.05 to 0.25 and back every 1.6 s.
+        level = 0.05 + 0.2 * (1 - Math.cos(2 * Math.PI * age / 1.6)) / 2;
+        pace = 0.5;
+      } else {
+        // The voice, about 30 times a second: risen to at once, settled from a third of the way at a time.
+        if (now - sampled > 33) {
+          sampled = now;
+          const heard = Math.max(0, Math.min(1, voice.level(now / 1000)));
+          aim = heard > aim ? heard : aim + (heard - aim) * 0.35;
+        }
+        level += (aim - level) * (1 - Math.exp(-dt / (aim > level ? 0.045 : 0.08)));
+        pace = 0.7 + level;
+      }
+      STRANDS.forEach((strand, i) => { turns[i] += Math.sign(strand.period) * dt * 1000 / Math.abs(strand.period) * pace; });
+      // Listening rolls out from the middle (60 ms in, over 750 ms, slowing); thinking blends to its colours in 450 ms.
+      const roll = resting ? 1 : Math.max(0, Math.min(1, (age - 0.06) / 0.75));
+      const blend = resting ? Math.min(1, age / 0.45) : 0;
+      draw(1 - (1 - roll) ** 3, 1 - (1 - blend) ** 3);
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }
+
   // ---- The island ---------------------------------------------------------------------------
 
   const IDLE = [190, 34, 17]; // at rest: Glyde, the weather and the time, as the app's resting pill
@@ -603,39 +726,46 @@
         `<div class="nx-actions"><button class="nx-btn primary" data-act="open">Open</button><button class="nx-btn" data-act="clear">Clear</button></div>`,
     }),
 
-    // Listening, as the app: Glyde, a streak of light that swells with the voice, and your words as you say them
-    // (when there are any to show); the island's edge glows violet.
+    // Listening, as the app: Glyde, its waves of light following the voice, and your words as you say them (when there
+    // are any to show); the island's edge glows cool, sky and aqua.
     siroListening: (heard = '') => ({
-      key: 'siro-listen' + (heard ? '-words' : ''), shape: heard ? [420, 66, 24] : [280, 40, 20],
+      key: 'siro-listen' + (heard ? '-words' : ''), shape: heard ? [420, 70, 24] : [280, 40, 20],
       cls: 'v-siro listening' + (heard ? ' words' : ''),
-      html: `${faceHTML('calm')}<div class="listen"><span class="streak"></span>${heard ? '<span class="heard-live"></span>' : ''}</div>`,
+      html: `${faceHTML('calm')}<div class="listen"><canvas class="waves" aria-hidden="true"></canvas>${heard ? '<span class="heard-live"></span>' : ''}</div>` +
+        `<span class="siro-corner close" aria-hidden="true">${ICON.x}</span>`,
       mount: (el, island) => {
         island.el.classList.add('edge-listen');
-        const streak = el.querySelector('.streak');
+        const stopWaves = mountWaves(el.querySelector('.waves'), 'live');
         const live = el.querySelector('.heard-live');
         const words = heard.split(' ');
         const started = performance.now();
-        let raf = 0;
-        const frame = now => {
-          if (!el.isConnected) return;
-          streak.style.setProperty('--v', voice.level(now / 1000).toFixed(3));
-          if (live) {
-            const said = reduceMotion ? words.length : Math.min(words.length, Math.floor((now - started) / 240) + 1);
-            live.textContent = words.slice(0, said).join(' ');
-          }
-          raf = requestAnimationFrame(frame);
-        };
-        raf = requestAnimationFrame(frame);
+        const timer = live && setInterval(() => {
+          const said = reduceMotion ? words.length : Math.min(words.length, Math.floor((performance.now() - started) / 240) + 1);
+          live.textContent = words.slice(0, said).join(' ');
+        }, 60);
         return () => {
-          cancelAnimationFrame(raf);
+          stopWaves();
+          clearInterval(timer);
           island.el.classList.remove('edge-listen');
         };
       },
     }),
 
-    siroThinking: (text = 'Thinking…') => ({
-      key: 'siro-think', shape: [200, 40, 20], cls: 'v-siro',
-      html: `${faceHTML('thinking')}<span class="siro-status">${esc(text)}</span>`,
+    // Working out what you said, as the app: the same waves, low and slowly swelling in the thinking colours, your words
+    // shimmering under them; the island's edge glows violet and rose, pulsing.
+    siroThinking: (heard = '') => ({
+      key: 'siro-think' + (heard ? '-words' : ''), shape: heard ? [420, 70, 24] : [280, 40, 20],
+      cls: 'v-siro listening thinking' + (heard ? ' words' : ''),
+      html: `${faceHTML('thinking')}<div class="listen"><canvas class="waves" aria-hidden="true"></canvas>` +
+        (heard ? `<span class="heard-live">${esc(heard)}</span>` : '') + `</div><span class="siro-corner close" aria-hidden="true">${ICON.x}</span>`,
+      mount: (el, island) => {
+        island.el.classList.add('edge-think');
+        const stopWaves = mountWaves(el.querySelector('.waves'), 'resting');
+        return () => {
+          stopWaves();
+          island.el.classList.remove('edge-think');
+        };
+      },
     }),
 
     // The answer: what you asked, in quotes, and Glyde's reply as it says it (■ stops it); the edge glows gold.

@@ -317,7 +317,7 @@ main, .footer { position: relative; z-index: 1; }
 .notch .island-shoulders::after { content: ''; position: absolute; top: 0; width: 10px; height: 10px; }
 .notch .island-shoulders::before { left: 0; background: radial-gradient(circle at 0 100%, transparent 9.5px, #000 10px); }
 .notch .island-shoulders::after { right: 0; background: radial-gradient(circle at 100% 100%, transparent 9.5px, #000 10px); }
-.notch .island.edge-listen, .notch .island.edge-speak { clip-path: inset(0 -40px -40px -40px); }
+.notch .island.edge-listen, .notch .island.edge-think, .notch .island.edge-speak { clip-path: inset(0 -40px -40px -40px); }
 
 /* A view: sized to its final shape, centred, revealed as the pill grows. */
 .iv {
@@ -576,30 +576,38 @@ main, .footer { position: relative; z-index: 1; }
 @keyframes mark-pulse { 50% { opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { .face img { animation: none !important; } }
 
-/* Listening: a streak of light that swells with the voice, and the words as they're said */
-.v-siro.listening .listen { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-width: 0; }
-.v-siro.listening.words { align-items: start; padding-top: 12px; }
+/* Listening (and thinking): the app's waves of light across the top, the words as they're said under them, Glyde at
+   the left of the waves (see mountWaves in island.js) */
+.v-siro.listening .listen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
+.v-siro.listening.words { align-items: start; padding-top: 4px; }
+.v-siro.listening.words .face { margin-top: 8px; }
 .v-siro.listening.words .listen { align-items: stretch; }
-.streak {
-  --v: .3;
-  align-self: center;
-  width: 70%;
-  height: 2px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, rgba(160, 130, 255, 0), #b9a6ff 30%, #ffd0f0 50%, #b9a6ff 70%, rgba(160, 130, 255, 0));
-  box-shadow: 0 0 10px 2px rgba(170, 140, 255, calc(.25 + var(--v) * .5));
-  transform: scaleX(calc(.45 + var(--v) * .55));
-  opacity: calc(.55 + var(--v) * .45);
-}
+.waves { display: block; align-self: center; width: 172px; height: 36px; flex: none; }
 .heard-live { font-size: 13px; font-weight: 600; text-align: center; color: rgba(255, 255, 255, .92); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 17px; }
+.v-siro.thinking .heard-live {
+  background: linear-gradient(90deg, rgba(255, 255, 255, .5), #fff, rgba(255, 255, 255, .5));
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-text 1.4s linear infinite;
+}
 
-/* The island's edge while Glyde listens (violet) and speaks (gold), as the app's */
-.island.edge-listen { box-shadow: 0 0 0 1px rgba(176, 150, 255, .6), 0 0 22px -2px rgba(150, 110, 255, .7), 0 14px 34px -10px rgba(10, 10, 40, .55); }
-.island.edge-speak { box-shadow: 0 0 0 1px rgba(255, 196, 110, .55), 0 6px 22px -4px rgba(255, 170, 70, .55), 0 14px 34px -10px rgba(10, 10, 40, .55); }
+/* The island's edge, in the app's colours: cool while Glyde listens (sky, aqua, periwinkle), violet and rose pulsing
+   while it thinks, gold and coral while it speaks */
+.island.edge-listen { box-shadow: 0 0 0 1px rgba(94, 196, 255, .65), 0 0 16px -2px rgba(79, 227, 214, .5), 0 0 28px -6px rgba(123, 140, 255, .6), 0 14px 34px -10px rgba(10, 10, 40, .55); }
+.island.edge-think { box-shadow: 0 0 0 1px rgba(168, 124, 255, .6), 0 0 16px -2px rgba(214, 107, 255, .45), 0 0 28px -6px rgba(236, 122, 184, .5), 0 14px 34px -10px rgba(10, 10, 40, .55); animation: edge-pulse 1.6s ease-in-out infinite; }
+.island.edge-speak { box-shadow: 0 0 0 1px rgba(255, 198, 107, .6), 0 0 16px -2px rgba(255, 143, 107, .45), 0 6px 26px -6px rgba(255, 169, 77, .55), 0 14px 34px -10px rgba(10, 10, 40, .55); }
+@keyframes edge-pulse { 50% { box-shadow: 0 0 0 1px rgba(168, 124, 255, .35), 0 0 10px -2px rgba(214, 107, 255, .25), 0 0 20px -6px rgba(236, 122, 184, .3), 0 14px 34px -10px rgba(10, 10, 40, .55); } }
+@media (prefers-reduced-motion: reduce) { .island.edge-think { animation: none; } }
 
 /* ■ at the answer's right end: stop it talking */
 .siro-corner { display: grid; place-items: center; align-self: start; width: 22px; height: 22px; margin-top: 9px; border-radius: 50%; background: rgba(255, 255, 255, .12); }
 .siro-corner i { width: 7px; height: 7px; border: 1.5px solid rgba(255, 255, 255, .9); border-radius: 2px; }
+/* (× while it listens or thinks: close it) */
+.siro-corner.close { color: rgba(255, 255, 255, .85); }
+.iv .siro-corner.close svg { width: 11px; height: 11px; }
+.v-siro.listening:not(.words) .siro-corner { align-self: center; margin-top: 0; width: 20px; height: 20px; }
 .siro-status { font-size: 13px; font-weight: 600; background: linear-gradient(90deg, rgba(255, 255, 255, .55), #fff, rgba(255, 255, 255, .55)); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shimmer-text 1.4s linear infinite; }
 @keyframes shimmer-text { from { background-position: 200% 0; } to { background-position: 0 0; } }
 .v-siro.answer .face { align-self: center; }
