@@ -199,7 +199,7 @@ main, .footer { position: relative; z-index: 1; }
 .nav-island {
   position: fixed;
   left: 50%;
-  top: 15px;
+  top: 0; /* (a notch, hanging from the top of the window) */
   translate: -50% 0;
   z-index: 60;
   pointer-events: none;
@@ -297,6 +297,28 @@ main, .footer { position: relative; z-index: 1; }
 .island-bubble.has-mic .mic { display: block; background: #ff9f0a; box-shadow: 0 0 8px #ff9f0a; }
 .island-bubble.has-cam .cam { display: block; background: #30d158; box-shadow: 0 0 8px #30d158; }
 
+/* The notch, the app's look by default, where the island hangs from an edge: black, square on top, round below,
+   with little shoulders curving out into the edge either side. */
+.island-shoulders { display: none; }
+.notch .island { --tint: #000; box-shadow: 0 16px 36px -14px rgba(10, 10, 40, .6); }
+.notch .island-glass { opacity: 1; }
+.notch .island-sheen { background: none; box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .07); }
+.notch .island-shoulders {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: calc(var(--iw, 190px) + 20px);
+  height: 10px;
+  translate: -50% 0;
+  pointer-events: none;
+}
+.notch .island-shoulders::before,
+.notch .island-shoulders::after { content: ''; position: absolute; top: 0; width: 10px; height: 10px; }
+.notch .island-shoulders::before { left: 0; background: radial-gradient(circle at 0 100%, transparent 9.5px, #000 10px); }
+.notch .island-shoulders::after { right: 0; background: radial-gradient(circle at 100% 100%, transparent 9.5px, #000 10px); }
+.notch .island.edge-listen, .notch .island.edge-speak { clip-path: inset(0 -40px -40px -40px); }
+
 /* A view: sized to its final shape, centred, revealed as the pill grows. */
 .iv {
   position: absolute;
@@ -331,22 +353,44 @@ main, .footer { position: relative; z-index: 1; }
 
 /* Tabs across the top of the expanded island */
 .tabs { position: absolute; top: 6px; left: 50%; translate: -50% 0; display: flex; align-items: center; gap: 4px; }
+/* (as the app's: the tab you're on a soft pill with its name beside its icon, the others just icons, then Ask) */
 .tab {
-  display: grid;
-  place-items: center;
-  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 34px;
   height: 26px;
-  padding: 0 13px;
+  padding: 0 10px;
   border: 0;
   border-radius: 13px;
   background: transparent;
   color: rgba(255, 255, 255, .55);
+  font: 600 12px/1 'Segoe UI Variable Text', 'Segoe UI', var(--sans);
+  white-space: nowrap;
   cursor: pointer;
   transition: background .2s, color .2s;
 }
+.iv .tab svg { width: 14px; height: 14px; flex: none; }
 .tab:hover { color: #fff; background: rgba(255, 255, 255, .07); }
-.tab.on { color: #fff; background: rgba(255, 255, 255, .16); }
-.tab-sep { width: 1px; height: 14px; margin: 0 2px; background: rgba(255, 255, 255, .2); }
+.tab.on { color: #fff; background: rgba(255, 255, 255, .14); padding: 0 12px 0 10px; }
+.tab-sep { width: 1px; height: 14px; margin: 0 3px; background: rgba(255, 255, 255, .2); }
+.tab-ask {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 11px 0 9px;
+  border: 1px solid rgba(160, 145, 255, .5);
+  border-radius: 13px;
+  background: rgba(123, 108, 255, .08);
+  color: #d6ceff;
+  font: 600 12px/1 'Segoe UI Variable Text', 'Segoe UI', var(--sans);
+  cursor: pointer;
+  transition: background .2s;
+}
+.tab-ask:hover { background: rgba(123, 108, 255, .2); }
+.iv .tab-ask svg { width: 13px; height: 13px; flex: none; }
 
 /* Level bars (music) */
 .bars { display: flex; align-items: center; gap: 2px; height: 14px; }
@@ -417,6 +461,51 @@ main, .footer { position: relative; z-index: 1; }
 .clock-body { display: flex; flex-direction: column; align-items: center; }
 .clock-time { font-size: 34px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .clock-date { font-size: 13px; color: rgba(255, 255, 255, .6); }
+.clock-wx { display: flex; align-items: center; gap: 5px; margin-top: 8px; padding: 3px 11px 4px 9px; border-radius: 12px; background: rgba(255, 255, 255, .1); font-size: 12px; }
+.iv .clock-wx svg { width: 12px; height: 12px; color: #ffd27a; }
+.clock-wx span { color: rgba(255, 255, 255, .6); }
+
+/* At rest: Glyde, then the weather and the time */
+.v-idle { display: flex; align-items: center; justify-content: space-between; padding: 0 15px 0 12px; }
+.idle-right { display: flex; align-items: center; gap: 10px; }
+.idle-wx { display: flex; align-items: center; gap: 4px; font-size: 12px; color: rgba(255, 255, 255, .62); }
+.iv .idle-wx svg { width: 13px; height: 13px; color: #ffd27a; }
+.idle-time { font-size: 13.5px; font-weight: 600; color: rgba(255, 255, 255, .95); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.idle-time small { margin-left: 1px; font-size: 10px; color: rgba(255, 255, 255, .6); }
+
+/* The lyrics button, at the controls' right end */
+.me-controls { position: relative; }
+.ib.lyr { position: absolute; right: -8px; width: 32px; height: 32px; padding: 8px; color: rgba(255, 255, 255, .72); }
+
+/* The Focus tab */
+.v-focus { padding: 44px 24px 12px; }
+.fc-body { display: grid; grid-template-columns: auto 1fr; column-gap: 22px; align-items: center; }
+.fc-dial { position: relative; display: grid; place-items: center; width: 98px; height: 98px; }
+.iv .fc-dial svg { position: absolute; inset: 0; fill: none; stroke: rgba(255, 255, 255, .16); stroke-width: 5; }
+.fc-dial b { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fc-phase { display: block; font-size: 17px; font-weight: 600; color: #ff6b5a; }
+.fc-lengths { display: flex; align-items: center; gap: 5px; margin: 7px 0 11px; }
+.fc-lengths span { display: grid; place-items: center; min-width: 30px; height: 24px; padding: 0 7px; border-radius: 12px; background: rgba(255, 255, 255, .1); font-size: 12px; font-weight: 600; }
+.fc-lengths span.on { background: rgba(255, 107, 90, .26); color: #ff8b7d; }
+.fc-lengths small { margin-left: 3px; font-size: 12px; color: rgba(255, 255, 255, .55); }
+.fc-start { display: flex; align-items: center; gap: 10px; }
+.fc-btn { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 14px 0 12px; border-radius: 14px; background: #ff6b5a; color: #fff; font-size: 12px; font-weight: 600; }
+.iv .fc-btn svg { width: 10px; height: 10px; }
+.fc-start small { font-size: 12px; color: rgba(255, 255, 255, .5); }
+
+/* The Prompter tab: the camera's mirror, and the script */
+.v-prompter { padding: 42px 14px 12px; }
+.pr-body { display: grid; grid-template-columns: 128px 1fr; column-gap: 12px; }
+.pr-mirror { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: 104px; border-radius: 14px; background: rgba(255, 255, 255, .08); color: rgba(255, 255, 255, .62); font-size: 11px; }
+.iv .pr-mirror svg { width: 20px; height: 20px; }
+.pr-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.pr-script { margin: 0; height: 66px; padding: 7px 10px; border-radius: 12px; background: rgba(255, 255, 255, .08); font-size: 12px; line-height: 1.45; color: rgba(255, 255, 255, .9); overflow: hidden; }
+.pr-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.pr-btn { display: flex; align-items: center; gap: 5px; height: 28px; padding: 0 12px 0 10px; border-radius: 14px; background: rgba(255, 255, 255, .14); }
+.iv .pr-btn svg { width: 11px; height: 11px; }
+.pr-btn.start { margin-left: auto; background: #7b6cff; font-weight: 600; }
+.pr-speed { display: flex; align-items: center; gap: 10px; color: rgba(255, 255, 255, .7); }
+.pr-speed b { font-weight: 500; }
 
 /* Level (volume / brightness) */
 .v-level { display: grid; grid-template-columns: auto 1fr 26px; column-gap: 12px; align-items: center; padding: 0 14px; }
@@ -474,23 +563,46 @@ main, .footer { position: relative; z-index: 1; }
 .nx-btn.primary { background: rgba(255, 255, 255, .2); }
 
 /* Siro */
-.v-siro { display: grid; grid-template-columns: auto 1fr; column-gap: 11px; align-items: center; padding: 0 18px 0 10px; }
-.orb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #8a6cff, #f05ab4 50%, #3db8ff);
-  box-shadow: 0 0 12px rgba(240, 90, 180, .6);
+.v-siro { display: grid; grid-template-columns: auto 1fr auto; column-gap: 11px; align-items: center; padding: 0 12px 0 12px; }
+
+/* Glyde: the app's pixel ghost, blinking now and then; a ? by its head while it thinks, sound lines as it speaks */
+.face { position: relative; display: block; width: 22px; height: 21px; flex: none; }
+.face img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.face .face-blink { opacity: 0; animation: face-blink 5.4s linear infinite; }
+@keyframes face-blink { 0%, 94% { opacity: 0; } 94.5%, 97% { opacity: 1; } 97.5%, 100% { opacity: 0; } }
+.face .face-mark.q { left: auto; right: -7px; top: -8px; width: 6px; height: 10px; animation: mark-bob 1.3s ease-in-out infinite; }
+.face .face-mark.s { left: auto; right: -8px; top: 5px; width: 6px; height: 11px; animation: mark-pulse .8s ease-in-out infinite; }
+@keyframes mark-bob { 50% { transform: translateY(-2px); } }
+@keyframes mark-pulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .face img { animation: none !important; } }
+
+/* Listening: a streak of light that swells with the voice, and the words as they're said */
+.v-siro.listening .listen { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-width: 0; }
+.v-siro.listening.words { align-items: start; padding-top: 12px; }
+.v-siro.listening.words .listen { align-items: stretch; }
+.streak {
+  --v: .3;
+  align-self: center;
+  width: 70%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(160, 130, 255, 0), #b9a6ff 30%, #ffd0f0 50%, #b9a6ff 70%, rgba(160, 130, 255, 0));
+  box-shadow: 0 0 10px 2px rgba(170, 140, 255, calc(.25 + var(--v) * .5));
+  transform: scaleX(calc(.45 + var(--v) * .55));
+  opacity: calc(.55 + var(--v) * .45);
 }
-.orb.listening { animation: orb-breathe 1.4s ease-in-out infinite, orb-spin 3s linear infinite; }
-.orb.thinking { animation: orb-spin 1s linear infinite, orb-breathe .8s ease-in-out infinite; }
-@keyframes orb-breathe { 50% { transform: scale(1.18); box-shadow: 0 0 18px rgba(138, 108, 255, .9); } }
-@keyframes orb-spin { to { filter: hue-rotate(360deg); } }
-.wave { display: flex; align-items: center; justify-content: center; gap: 3px; height: 24px; }
-.wave i { width: 3px; height: 3px; border-radius: 2px; background: linear-gradient(180deg, #c7b8ff, #ff8fd0); }
+.heard-live { font-size: 13px; font-weight: 600; text-align: center; color: rgba(255, 255, 255, .92); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 17px; }
+
+/* The island's edge while Glyde listens (violet) and speaks (gold), as the app's */
+.island.edge-listen { box-shadow: 0 0 0 1px rgba(176, 150, 255, .6), 0 0 22px -2px rgba(150, 110, 255, .7), 0 14px 34px -10px rgba(10, 10, 40, .55); }
+.island.edge-speak { box-shadow: 0 0 0 1px rgba(255, 196, 110, .55), 0 6px 22px -4px rgba(255, 170, 70, .55), 0 14px 34px -10px rgba(10, 10, 40, .55); }
+
+/* ■ at the answer's right end: stop it talking */
+.siro-corner { display: grid; place-items: center; align-self: start; width: 22px; height: 22px; margin-top: 9px; border-radius: 50%; background: rgba(255, 255, 255, .12); }
+.siro-corner i { width: 7px; height: 7px; border: 1.5px solid rgba(255, 255, 255, .9); border-radius: 2px; }
 .siro-status { font-size: 13px; font-weight: 600; background: linear-gradient(90deg, rgba(255, 255, 255, .55), #fff, rgba(255, 255, 255, .55)); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shimmer-text 1.4s linear infinite; }
 @keyframes shimmer-text { from { background-position: 200% 0; } to { background-position: 0 0; } }
-.v-siro.answer .orb { align-self: center; }
+.v-siro.answer .face { align-self: center; }
 .siro-ans { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .siro-heard { font-size: 12px; color: rgba(255, 255, 255, .6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .siro-reply { font-size: 14px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -498,9 +610,13 @@ main, .footer { position: relative; z-index: 1; }
 /* Clipboard */
 .v-clip { padding: 40px 10px 6px; }
 .clip-list { display: flex; flex-direction: column; }
+.clip-search { display: flex; align-items: center; gap: 8px; height: 30px; margin: 0 4px 6px; padding: 0 12px; border-radius: 15px; background: rgba(255, 255, 255, .08); color: rgba(255, 255, 255, .5); font-size: 12.5px; }
+.iv .clip-search svg { width: 13px; height: 13px; }
+.clip-acts { display: flex; align-items: center; gap: 14px; color: rgba(255, 255, 255, .45); }
+.iv .clip-acts svg { width: 13px; height: 13px; }
 .clip-row {
   display: grid;
-  grid-template-columns: 28px 1fr auto;
+  grid-template-columns: 28px 1fr auto auto;
   column-gap: 10px;
   align-items: center;
   height: 36px;
@@ -771,7 +887,7 @@ main, .footer { position: relative; z-index: 1; }
 .dw-body span { height: 6px; border-radius: 3px; background: rgba(13, 16, 36, .12); }
 .dw-body span.short { width: 64%; }
 
-.island-slot { position: absolute; left: 0; right: 0; top: 8px; z-index: 3; }
+.island-slot { position: absolute; left: 0; right: 0; top: 0; z-index: 3; } /* (a notch, from the screen's top edge) */
 
 .hover-hint {
   position: absolute;
@@ -968,7 +1084,7 @@ section { position: relative; scroll-margin-top: 70px; }
   position: relative;
   height: 128px;
   margin: 12px 12px 0;
-  padding-top: 14px;
+  padding-top: 0; /* (the island hangs from its top edge, a notch) */
   border-radius: 20px;
   overflow: hidden;
   background: linear-gradient(180deg, #a8c1fb 0%, #cfc6fa 55%, #f4d9ec 100%);
@@ -1558,7 +1674,8 @@ html.launched .prelaunch-only { display: none; }
 
 .v-siro.answer.longer .siro-reply { -webkit-line-clamp: 3; font-size: 13.5px; }
 .v-siro.draft { align-items: start; padding: 16px 18px 0 14px; }
-.v-siro.draft .orb { margin-top: 2px; }
+.v-siro.draft { grid-template-columns: auto 1fr; }
+.v-siro.draft .face { margin-top: 0; }
 .draft-panel { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .draft-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; }
 .draft-ic { width: 15px; height: 15px; color: rgba(255, 255, 255, .7); }
@@ -1741,7 +1858,7 @@ html.launched .prelaunch-only { display: none; }
 
 /* Navigation island: the voice section's view */
 .v-navv { display: flex; align-items: center; gap: 9px; padding: 0 14px 0 8px; }
-.v-navv .orb { width: 18px; height: 18px; flex: none; }
+.v-navv .face { width: 20px; height: 19px; }
 .v-navv b { font-size: 13px; font-weight: 600; white-space: nowrap; }
 
 @media (max-width: 640px) {

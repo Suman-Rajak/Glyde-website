@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const { Island, Director, V, ICON, TRACKS, player, voice, artHTML, reduceMotion, sleep, esc } = window.WI;
+  const { Island, Director, V, ICON, TRACKS, player, voice, artHTML, faceHTML, reduceMotion, sleep, esc } = window.WI;
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
@@ -92,7 +92,7 @@
   };
 
   const siroScript = (heard, reply, effect) => async ({ show, wait }) => {
-    show(V.siroListening());
+    show(V.siroListening(heard));
     if (!await wait(1800)) return;
     show(V.siroThinking());
     if (!await wait(600)) return;
@@ -108,9 +108,12 @@
 
   // Hovering an island with music opens it, with tabs for the clipboard and file shelf.
   function expandedView(tab) {
-    if (tab === 1) return V.clipboard();
-    if (tab === 2) return V.shelf();
-    if (tab === 3) return V.timers();
+    // (the app's tabs, in its order: what's playing or the clock, Focus, Prompter, Clipboard, Shelf, Timers)
+    if (tab === 1) return V.focus();
+    if (tab === 2) return V.prompter();
+    if (tab === 3) return V.clipboard();
+    if (tab === 4) return V.shelf();
+    if (tab === 5) return V.timers();
     return V.mediaExpanded(true);
   }
 
@@ -192,7 +195,7 @@
   // The menu island acts the page out too: now playing in Music, Glyde listening in the voice section.
   const navVoice = () => ({
     key: 'nav-voice', shape: [196, 34, 17], cls: 'v-navv',
-    html: '<span class="orb listening"></span><b>Say “Hey Glyde”</b>',
+    html: `${faceHTML('calm')}<b>Say “Hey Glyde”</b>`,
   });
   const navIsland = new Island($('#nav-island'), { music: true });
   navIsland.setNeutral(true);
@@ -375,7 +378,7 @@
 
   // Clipboard: the tabs work, rows "copy".
   const clipboard = new Director(new Island(card('clipboard'), { music: true }), { base() { return expandedView(this.tab); } });
-  clipboard.tab = 1;
+  clipboard.tab = 3;
   clipboard.refresh();
   islandActions(clipboard);
 
@@ -569,7 +572,7 @@
   const brain = new Director(brainIsland, { base: () => V.idle() });
 
   const drafted = (heard, draft, opened) => async ({ show, wait, director }) => {
-    show(V.siroListening());
+    show(V.siroListening(heard));
     if (!await wait(1900)) return;
     show(V.siroThinking());
     if (!await wait(900)) return;
@@ -578,7 +581,7 @@
     await wait(7000);
   };
   const answered = (heard, reply) => async ({ show, wait }) => {
-    show(V.siroListening());
+    show(V.siroListening(heard));
     if (!await wait(1800)) return;
     show(V.siroThinking());
     if (!await wait(900)) return;

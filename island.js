@@ -69,6 +69,9 @@
     split: stroke('<rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="M12 4.5v15"/>'),
     trophy: stroke('<path d="M7.5 4h9v5a4.5 4.5 0 0 1-9 0V4z"/><path d="M7.5 6H4.5a3 3 0 0 0 3 4M16.5 6h3a3 3 0 0 1-3 4M12 13.5V17M8.5 20.5h7M9.5 17h5v3.5h-5z"/>'),
     menu: stroke('<rect x="2.5" y="4" width="19" height="16" rx="3"/><path d="M2.5 8.5h19M6 6.3h.01M8.5 6.3h3"/>'),
+    target: stroke('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/>'),
+    bookmark: stroke('<path d="M7 3.5h10a1 1 0 0 1 1 1v16l-6-4-6 4v-16a1 1 0 0 1 1-1z"/>'),
+    lyrics: stroke('<path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 9 19.2l-4.5.3z"/><path d="M9 10.5h6M9 13.5h3.5"/>'),
   };
 
   function batteryIcon(percent, color) {
@@ -171,15 +174,20 @@
 
   // ---- The island ---------------------------------------------------------------------------
 
-  const IDLE = [124, 32, 16];
+  const IDLE = [190, 34, 17]; // at rest: Glyde, the weather and the time, as the app's resting pill
 
   class Island {
     constructor(stage, options = {}) {
       this.stage = stage;
       this.options = options;
+      // Hanging from an edge (the top of the page, of a screen or of a card), it's a notch, as the app is by default:
+      // square on top, round below, with little shoulders curving out into the edge. Elsewhere, the floating pill.
+      this.notch = options.notch ?? !!stage.closest('.nav-island, .display, .card-screen');
       stage.classList.add('island-stage');
+      stage.classList.toggle('notch', this.notch);
       stage.innerHTML =
         '<div class="island-scaler">' +
+          '<div class="island-shoulders" aria-hidden="true"></div>' +
           '<div class="island">' +
             '<div class="island-glass"></div><div class="island-glow"></div>' +
             '<div class="island-views"></div><div class="island-sheen"></div>' +
@@ -316,9 +324,11 @@
       const { w, h, r } = this.springs;
       const width = Math.max(20, w.x);
       const height = Math.max(20, h.x);
+      const radius = Math.min(r.x, height / 2, width / 2);
       this.el.style.width = width + 'px';
       this.el.style.height = height + 'px';
-      this.el.style.borderRadius = Math.min(r.x, height / 2, width / 2) + 'px';
+      this.el.style.borderRadius = this.notch ? `0 0 ${radius}px ${radius}px` : radius + 'px';
+      this.stage.style.setProperty('--iw', width + 'px');
       this.bubble.style.setProperty('--bx', (width / 2 + 6) + 'px');
     }
   }
@@ -335,12 +345,43 @@
     return `<div class="art art-${track.art} ${size}" style="--c1:${a};--c2:${b};--c3:${c}"></div>`;
   }
 
+  // Glyde, the app's little pixel ghost (its own pictures, in glyde/): calm (blinking now and then), happy, thinking (a
+  // ? by its head) or speaking (sound lines by its mouth).
+  const FACES = { calm: 'idle', happy: 'happy', thinking: 'thinking', speaking: 'speaking' };
+  function faceHTML(look = 'calm') {
+    const mark = look === 'thinking' ? '<img class="face-mark q" src="glyde/question.png" alt="">'
+      : look === 'speaking' ? '<img class="face-mark s" src="glyde/sound.png" alt="">' : '';
+    const blink = look === 'calm' ? '<img class="face-blink" src="glyde/blink.png" alt="">' : '';
+    return `<span class="face ${look}" aria-hidden="true"><img src="glyde/${FACES[look]}.png" alt="">${blink}${mark}</span>`;
+  }
+
+  // The time as Windows shows it on the resting island: "10:54" with a small "pm" (or 24 hours, where that's the way).
+  function clockHTML(date = new Date()) {
+    const parts = new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit' }).formatToParts(date);
+    const part = type => parts.find(p => p.type === type)?.value || '';
+    const period = part('dayPeriod');
+    return `${part('hour')}:${part('minute')}${period ? `<small>${esc(period.toLowerCase())}</small>` : ''}`;
+  }
+
+  const weatherIcon = (date = new Date()) => (date.getHours() < 6 || date.getHours() >= 19 ? ICON.moon : ICON.sun);
+
+  // The open island's tab row, as the app's: the tab you're on a soft pill with its name beside its icon, the rest just
+  // icons; then, past a line, Ask.
+  const TABS = [
+    () => (player.playing ? [ICON.note, 'Now playing'] : [ICON.clock, 'Clock']),
+    () => [ICON.target, 'Focus'],
+    () => [ICON.camera, 'Prompter'],
+    () => [ICON.clipboard, 'Clipboard'],
+    () => [ICON.tray, 'Shelf'],
+    () => [ICON.stopwatch, 'Timers'],
+  ];
   function tabsHTML(active) {
-    const first = player.playing ? ICON.note : ICON.clock;
-    const tab = (i, icon, label) =>
-      `<button class="tab${i === active ? ' on' : ''}" data-act="tab:${i}" aria-label="${label}">${icon}</button>`;
-    return `<div class="tabs">${tab(0, first, 'Music')}${tab(1, ICON.clipboard, 'Clipboard')}${tab(2, ICON.tray, 'File shelf')}${tab(3, ICON.stopwatch, 'Timers')}` +
-      `<span class="tab-sep"></span><button class="tab" data-act="siro" aria-label="Glyde">${ICON.mic}</button></div>`;
+    const tab = (make, i) => {
+      const [icon, name] = make();
+      return `<button class="tab${i === active ? ' on' : ''}" data-act="tab:${i}" aria-label="${name}">${icon}${i === active ? `<span>${name}</span>` : ''}</button>`;
+    };
+    return `<div class="tabs">${TABS.map(tab).join('')}<span class="tab-sep"></span>` +
+      `<button class="tab-ask" data-act="siro" aria-label="Ask Glyde">${ICON.sparkle}<span>Ask</span></button></div>`;
   }
 
   // Keeps a media view in step with the player: artwork, titles, progress, play state.
@@ -377,6 +418,12 @@
 
   const bars = n => `<div class="bars">${'<i></i>'.repeat(n)}</div>`;
 
+  // Charging, how long till it's full, as the app says it ("Full in 1h 24m").
+  const fullIn = percent => {
+    const minutes = Math.max(1, Math.round((100 - percent) * 1.6));
+    return minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${minutes} min`;
+  };
+
   const CLIPBOARD = [
     { kind: 'text', text: 'Launch notes: ship on the 14th, tell everyone ✨', when: 'now' },
     { kind: 'link', text: 'figma.com/file/island-glass-v3', when: '2m' },
@@ -411,7 +458,8 @@
       const thumb = item.kind === 'image'
         ? '<span class="clip-thumb"></span>'
         : `<span class="clip-ic">${ICON[item.kind]}</span>`;
-      return `<button class="clip-row" data-act="clip:${i}">${thumb}<span class="clip-text">${esc(item.text)}</span><span class="clip-when">${item.when}</span></button>`;
+      return `<button class="clip-row" data-act="clip:${i}">${thumb}<span class="clip-text">${esc(item.text)}</span><span class="clip-when">${item.when}</span>` +
+        `<span class="clip-acts" aria-hidden="true">${ICON.bookmark}${ICON.x}</span></button>`;
     }).join('');
   }
 
@@ -423,7 +471,18 @@
   }
 
   const V = {
-    idle: () => ({ key: 'idle', shape: IDLE, html: '' }),
+    // At rest: Glyde at the left, blinking now and then; the weather and the time at the right.
+    idle: () => ({
+      key: 'idle', shape: IDLE, cls: 'v-idle',
+      html: `${faceHTML('calm')}<span class="idle-right"><span class="idle-wx">${weatherIcon()}<span>24°</span></span><b class="idle-time"></b></span>`,
+      mount: el => {
+        const time = el.querySelector('.idle-time');
+        const update = () => { time.innerHTML = clockHTML(); };
+        update();
+        const timer = setInterval(update, 10000);
+        return () => clearInterval(timer);
+      },
+    }),
 
     mediaCompact: () => ({
       key: 'media-compact', shape: [250, 34, 17], cls: 'v-mc',
@@ -441,15 +500,18 @@
         `<div class="me-progress"><span class="me-el">0:00</span><div class="me-track"><i class="me-fill"></i></div><span class="me-rem">-0:00</span></div>` +
         `<div class="me-controls"><button class="ib" data-act="prev" aria-label="Previous">${ICON.prev}</button>` +
         `<button class="ib big" data-act="toggle" aria-label="Pause">${ICON.pause}</button>` +
-        `<button class="ib" data-act="next" aria-label="Next">${ICON.next}</button></div>`,
+        `<button class="ib" data-act="next" aria-label="Next">${ICON.next}</button>` +
+        `<button class="ib lyr" data-act="lyrics" aria-label="Lyrics">${ICON.lyrics}</button></div>`,
       mount: bindMedia,
     }),
 
+    // Open with nothing playing: the time big, the date, and the weather where you are.
     clock: (withTabs = false) => ({
       key: 'clock' + (withTabs ? '-tabs' : ''),
-      shape: withTabs ? [300, 126, 30] : [300, 92, 30],
+      shape: withTabs ? [420, 160, 32] : [300, 124, 30],
       cls: 'v-clock' + (withTabs ? ' with-tabs' : ''),
-      html: (withTabs ? tabsHTML(0) : '') + '<div class="clock-body"><b class="clock-time"></b><span class="clock-date"></span></div>',
+      html: (withTabs ? tabsHTML(0) : '') + '<div class="clock-body"><b class="clock-time"></b><span class="clock-date"></span>' +
+        `<span class="clock-wx">${weatherIcon()}<b>24°</b><span>Delhi</span></span></div>`,
       mount: el => {
         const update = () => {
           const now = new Date();
@@ -463,13 +525,30 @@
     }),
 
     clipboard: (items = CLIPBOARD) => ({
-      key: 'clipboard', shape: [420, 226, 32], cls: 'v-clip with-tabs',
-      html: tabsHTML(1) + `<div class="clip-list">${clipRows(items)}</div>`,
+      key: 'clipboard', shape: [420, 262, 32], cls: 'v-clip with-tabs',
+      html: tabsHTML(3) + `<div class="clip-search">${ICON.search}<span>Search what you copied</span></div>` +
+        `<div class="clip-list">${clipRows(items)}</div>`,
+    }),
+
+    // The Focus tab: how long, and Start (a tomato red, as the app's).
+    focus: () => ({
+      key: 'focus', shape: [420, 168, 32], cls: 'v-focus with-tabs',
+      html: tabsHTML(1) + `<div class="fc-body"><div class="fc-dial"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/></svg><b>25:00</b></div>` +
+        `<div class="fc-side"><b class="fc-phase">Focus</b><div class="fc-lengths"><span>15</span><span class="on">25</span><span>50</span><span>90</span><small>min</small></div>` +
+        `<div class="fc-start"><span class="fc-btn">${ICON.play}Start</span><small>5 min breaks</small></div></div></div>`,
+    }),
+
+    // The Prompter tab: the camera's mirror, and the script with its speed and Start.
+    prompter: () => ({
+      key: 'prompter', shape: [440, 174, 32], cls: 'v-prompter with-tabs',
+      html: tabsHTML(2) + `<div class="pr-body"><div class="pr-mirror">${ICON.camera}<span>Show my camera</span></div>` +
+        `<div class="pr-side"><p class="pr-script">Good morning, everyone, and thanks for joining. Today I want to walk you through what we shipped this month, and what's next.</p>` +
+        `<div class="pr-row"><span class="pr-btn">${ICON.clipboard}Paste</span><span class="pr-speed">−<b>1×</b>+</span><span class="pr-btn start">${ICON.play}Start</span></div></div></div>`,
     }),
 
     shelf: (items = SHELF) => ({
       key: 'shelf', shape: [420, 216, 32], cls: 'v-shelf with-tabs',
-      html: tabsHTML(2) + `<div class="shelf-grid">${shelfTiles(items)}</div>`,
+      html: tabsHTML(4) + `<div class="shelf-grid">${shelfTiles(items)}</div>`,
       apply: el => { el.querySelector('.shelf-grid').innerHTML = shelfTiles(items); },
     }),
 
@@ -485,12 +564,12 @@
 
     battery: (percent, state = 'charging') => {
       const look = {
-        charging: { label: 'Charging', color: '#30d158', icon: ICON.bolt },
+        charging: { label: `Full in ${fullIn(percent)}`, color: '#30d158', icon: ICON.bolt },
         full: { label: 'Fully charged', color: '#30d158', icon: ICON.bolt },
         low: { label: 'Low battery', color: '#ff453a', icon: ICON.battery },
       }[state];
       return {
-        key: 'battery-' + state, shape: [260, 34, 17], cls: 'v-bat',
+        key: 'battery-' + state, shape: [280, 34, 17], cls: 'v-bat',
         html: `<span class="ic" style="color:${look.color}">${look.icon}</span><b class="bat-label">${look.label}</b>` +
           `<b class="bat-pct" style="color:${look.color}">${percent}%</b>${batteryIcon(percent, look.color)}`,
       };
@@ -524,52 +603,59 @@
         `<div class="nx-actions"><button class="nx-btn primary" data-act="open">Open</button><button class="nx-btn" data-act="clear">Clear</button></div>`,
     }),
 
-    siroListening: () => ({
-      key: 'siro-listen', shape: [250, 36, 18], cls: 'v-siro',
-      html: `<span class="orb listening"></span><div class="wave">${'<i></i>'.repeat(23)}</div>`,
-      mount: el => {
-        const barsEl = [...el.querySelectorAll('.wave i')];
-        const half = Math.ceil(barsEl.length / 2);
-        const history = new Array(half).fill(0);
+    // Listening, as the app: Glyde, a streak of light that swells with the voice, and your words as you say them
+    // (when there are any to show); the island's edge glows violet.
+    siroListening: (heard = '') => ({
+      key: 'siro-listen' + (heard ? '-words' : ''), shape: heard ? [420, 66, 24] : [280, 40, 20],
+      cls: 'v-siro listening' + (heard ? ' words' : ''),
+      html: `${faceHTML('calm')}<div class="listen"><span class="streak"></span>${heard ? '<span class="heard-live"></span>' : ''}</div>`,
+      mount: (el, island) => {
+        island.el.classList.add('edge-listen');
+        const streak = el.querySelector('.streak');
+        const live = el.querySelector('.heard-live');
+        const words = heard.split(' ');
+        const started = performance.now();
         let raf = 0;
-        let lastPush = 0;
         const frame = now => {
           if (!el.isConnected) return;
-          if (now - lastPush > 45) {
-            lastPush = now;
-            history.unshift(voice.level(now / 1000));
-            history.length = half;
+          streak.style.setProperty('--v', voice.level(now / 1000).toFixed(3));
+          if (live) {
+            const said = reduceMotion ? words.length : Math.min(words.length, Math.floor((now - started) / 240) + 1);
+            live.textContent = words.slice(0, said).join(' ');
           }
-          // Newest in the middle, spreading out to both ends.
-          barsEl.forEach((bar, i) => {
-            const d = Math.abs(i - (barsEl.length - 1) / 2);
-            const v = history[Math.round(d)] || 0;
-            bar.style.height = (3 + v * 19 * (1 - d / (half * 1.6))).toFixed(1) + 'px';
-          });
           raf = requestAnimationFrame(frame);
         };
         raf = requestAnimationFrame(frame);
-        return () => cancelAnimationFrame(raf);
+        return () => {
+          cancelAnimationFrame(raf);
+          island.el.classList.remove('edge-listen');
+        };
       },
     }),
 
     siroThinking: (text = 'Thinking…') => ({
-      key: 'siro-think', shape: [190, 36, 18], cls: 'v-siro',
-      html: `<span class="orb thinking"></span><span class="siro-status">${esc(text)}</span>`,
+      key: 'siro-think', shape: [200, 40, 20], cls: 'v-siro',
+      html: `${faceHTML('thinking')}<span class="siro-status">${esc(text)}</span>`,
     }),
 
+    // The answer: what you asked, in quotes, and Glyde's reply as it says it (■ stops it); the edge glows gold.
     siroAnswer: (heard, reply) => {
-      const shape = reply.length > 90 ? [420, 94, 28] : reply.length > 42 ? [380, 74, 26] : [380, 56, 24];
+      const shape = reply.length > 90 ? [430, 100, 26] : reply.length > 42 ? [400, 80, 24] : [390, 62, 24];
       return {
         key: 'siro-answer-' + reply, shape, cls: 'v-siro answer' + (reply.length > 90 ? ' longer' : ''),
-        html: `<span class="orb"></span><div class="siro-ans"><span class="siro-heard">“${esc(heard)}”</span><b class="siro-reply">${esc(reply)}</b></div>`,
+        html: `${faceHTML('speaking')}<div class="siro-ans"><span class="siro-heard">“${esc(heard)}”</span><b class="siro-reply">${esc(reply)}</b></div>` +
+          '<span class="siro-corner" aria-hidden="true"><i></i></span>',
+        mount: (el, island) => {
+          island.el.classList.add('edge-speak');
+          return () => island.el.classList.remove('edge-speak');
+        },
       };
     },
 
     // An email or WhatsApp message from Glyde's brain, waiting for a yes.
     siroDraft: d => ({
       key: 'siro-draft-' + d.title, shape: [440, 140, 30], cls: 'v-siro draft',
-      html: `<span class="orb"></span><div class="draft-panel">` +
+      html: `${faceHTML('happy')}<div class="draft-panel">` +
         `<b class="draft-title"><span class="draft-ic">${ICON[d.icon]}</span>${esc(d.title)}</b>` +
         (d.subject ? `<span class="draft-subject">${esc(d.subject)}</span>` : '') +
         `<span class="draft-body">${esc(d.body)}</span>` +
@@ -594,7 +680,7 @@
 
     timers: (items = TIMERS) => ({
       key: 'timers', shape: [420, 214, 32], cls: 'v-timers with-tabs',
-      html: tabsHTML(3) + `<div class="tm-list">${timerRows(items)}</div>`,
+      html: tabsHTML(5) + `<div class="tm-list">${timerRows(items)}</div>`,
     }),
   };
 
@@ -713,5 +799,5 @@
     }
   }
 
-  window.WI = { Island, Director, V, ICON, TRACKS, CLIPBOARD, SHELF, player, voice, colorsFor, artHTML, batteryIcon, reduceMotion, sleep, esc };
+  window.WI = { Island, Director, V, ICON, TRACKS, CLIPBOARD, SHELF, player, voice, colorsFor, artHTML, batteryIcon, faceHTML, reduceMotion, sleep, esc };
 })();
