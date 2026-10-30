@@ -13,9 +13,7 @@
   <meta name="twitter:card" content="summary">
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Allura&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script>document.documentElement.classList.add('js');</script>
   <script defer src="config.js"></script>
@@ -49,21 +47,22 @@
       </div>
 
       <div class="hero-inner">
-        <a class="eyebrow reveal" href="#brain"><span class="new-tag">Soon</span>Coming soon: Glyde AI, with answers, pictures, emails and a natural voice<span class="eb-arrow" data-icon="arrow"></span></a>
+        <a class="eyebrow reveal" href="#pricing"><span class="new-tag">Free</span>The island is free. Glyde Pro is one payment, after a 14-day trial<span class="eb-arrow" data-icon="arrow"></span></a>
         <h1 class="hero-title">
           <span class="line"><span>Your desktop</span></span>
           <span class="line"><span>just got a <em class="halo-word">halo.</em></span></span>
         </h1>
         <p class="hero-sub reveal" style="--d:.35s">Glyde is a voice island for Windows. Music and lyrics, messages, calls, timers and your clipboard appear at the top of your screen the moment they matter, then melt away. And it answers to “Hey&nbsp;Glyde”.</p>
 
-        <div class="get-row reveal" style="--d:.5s">
+        <!-- Until launch, one thing to do (the waitlist); the Download and Store buttons appear once config.js has their links. -->
+        <div class="get-row launch-only reveal" style="--d:.5s">
           <a class="btn btn-glow btn-lg" href="#get" data-download><span class="btn-ic" data-icon="download"></span><span>Download for Windows</span></a>
           <a class="store-badge" href="#get" data-store><span class="sb-ic" data-icon="bag"></span><span class="sb-text"><small>Get it from</small><b>Microsoft Store</b></span></a>
         </div>
-        <p class="get-note reveal" style="--d:.55s" data-get-note>Coming soon for Windows 10 &amp; 11</p>
+        <p class="get-note launch-only reveal" style="--d:.55s" data-get-note>Free for Windows 10 &amp; 11</p>
 
-        <div class="prelaunch-only reveal" style="--d:.65s">
-          <p class="waitlist-label">Almost ready. Get one email the day it launches:</p>
+        <div class="prelaunch-only reveal" style="--d:.5s">
+          <p class="waitlist-label">Coming soon for Windows 10 and 11. Get one email the day it launches:</p>
           <form class="waitlist" data-waitlist data-source="hero" novalidate>
             <label class="sr-only" for="email-hero">Email address</label>
             <input id="email-hero" name="email" type="email" required placeholder="you@example.com" autocomplete="email">
@@ -122,7 +121,7 @@
     <section class="story" id="how" data-section="How it works">
       <div class="section-head reveal">
         <p class="kicker">How it lives</p>
-        <h2>Right where your eyes <em>already are.</em></h2>
+        <h2>Right where your eyes <span class="soft">already are.</span></h2>
       </div>
       <div class="story-grid">
         <div class="story-stick">
@@ -171,7 +170,7 @@
     <section class="features" id="features" data-section="Features">
       <div class="section-head center reveal">
         <p class="kicker">Live activities</p>
-        <h2>Everything happening. <em>One glance.</em></h2>
+        <h2>Everything happening. <span class="soft">One glance.</span></h2>
         <p class="lede">Every one of these is something the app really shows. Go on, poke them.</p>
       </div>
 
@@ -270,8 +269,8 @@
       </div>
 
       <div class="more" id="more">
-        <h3 class="more-title reveal">And there's <em>more.</em></h3>
-        <ul class="more-grid">
+        <h3 class="more-title reveal">And there's <span class="soft">more.</span></h3>
+        <ul class="more-grid" id="more-grid">
           <li class="reveal"><span class="more-ic" data-icon="text"></span><b>Synced lyrics</b><p>The line being sung lights up as it plays. Click a line to jump there.</p></li>
           <li class="reveal" style="--d:.05s"><span class="more-ic" data-icon="phone"></span><b>Incoming calls</b><p>Phone Link, WhatsApp and Teams calls ring on the island, with a button to answer in the app.</p></li>
           <li class="reveal" style="--d:.1s"><span class="more-ic" data-icon="calendar"></span><b>Meeting countdown</b><p>Ten minutes before a meeting in your Windows calendar, with Join for Teams, Zoom, Meet and Webex.</p></li>
@@ -283,9 +282,10 @@
           <li class="reveal" style="--d:.1s"><span class="more-ic" data-icon="camera"></span><b>Teleprompter and mirror</b><p>Your script scrolling just under the webcam, and a quick look at yourself before a call.</p></li>
           <li class="reveal"><span class="more-ic" data-icon="menu"></span><b>A Mac-style menu bar</b><p>Menus, Control Center, Wi-Fi, sound, battery and the calendar, beside the notch.</p></li>
           <li class="reveal" style="--d:.05s"><span class="more-ic" data-icon="search"></span><b>Search</b><p>Apps, files and sums from a shortcut, like Spotlight.</p></li>
-          <li class="reveal" style="--d:.1s"><span class="more-ic" data-icon="split"></span><b>PC actions</b><p>“Open Claude and Brave in split screen”, “play Believer on YouTube”, “open Bluetooth settings”.</p></li>
+          <li class="reveal" style="--d:.1s"><span class="more-ic" data-icon="split"></span><b>PC actions</b><p>Two apps side by side in split screen, a song on YouTube, or any page of Settings, just by asking.</p></li>
           <li class="reveal"><span class="more-ic" data-icon="code"></span><b>Coding agents</b><p>Claude Code and Codex on the island: Allow or Deny from it, a ping when one needs you, and risky moves stopped until you say so.</p></li>
         </ul>
+        <p class="more-row"><button class="more-toggle" type="button" aria-expanded="false" aria-controls="more-grid" hidden>Show all</button></p>
       </div>
     </section>
 
@@ -295,7 +295,7 @@
       <div class="music-grid">
         <div class="music-copy reveal">
           <p class="kicker">Colour that listens</p>
-          <h2>It wears <em>your music.</em></h2>
+          <h2>It wears <span class="soft">your music.</span></h2>
           <p class="lede">The glass, the level bars and the progress bar take their colours from the artwork. No artwork? Glyde looks it up, or paints a colour from the song itself.</p>
           <div class="albums" role="radiogroup" aria-label="Pick a song"></div>
           <label class="switch">
@@ -315,37 +315,34 @@
     <section class="say-it" id="say-it" data-section="Just say it" aria-labelledby="say-it-title">
       <div class="section-head center reveal">
         <p class="kicker">Just say it</p>
-        <h2 id="say-it-title">Talk to your PC <em>like a person.</em></h2>
+        <h2 id="say-it-title">Talk to your PC <span class="soft">like a person.</span></h2>
       </div>
       <div class="marquee" data-speed="38" aria-hidden="true">
         <div class="marquee-track">
-          <span class="phrase"><i class="dot"></i>Hey&nbsp;Glyde, next song</span>
-          <span class="phrase"><i class="dot"></i>Timer 10 minutes</span>
+          <span class="phrase"><i class="dot"></i>Hey&nbsp;Glyde, pause the music</span>
           <span class="phrase"><i class="dot"></i>Wake me up at 6:30</span>
-          <span class="phrase"><i class="dot"></i>Volume 30</span>
-          <span class="phrase"><i class="dot"></i>Remind me at 5 to call Mom</span>
-          <span class="phrase"><i class="dot"></i>Open Chrome</span>
+          <span class="phrase"><i class="dot"></i>Previous song</span>
           <span class="phrase"><i class="dot"></i>Make the screen dimmer</span>
-          <span class="phrase"><i class="dot"></i>What time is it?</span>
           <span class="phrase"><i class="dot"></i>Open Claude and Brave in split screen</span>
+          <span class="phrase"><i class="dot"></i>Mute</span>
           <span class="phrase"><i class="dot"></i>Play Believer on YouTube</span>
           <span class="phrase"><i class="dot"></i>Open Bluetooth settings</span>
           <span class="phrase"><i class="dot"></i>Find my resume</span>
+          <span class="phrase"><i class="dot"></i>Lock my PC</span>
         </div>
       </div>
       <div class="marquee light" data-speed="-30" aria-hidden="true">
         <div class="marquee-track">
-          <span class="phrase"><span class="ph-ic" data-icon="mail"></span>Mail Rahul that the meeting moved to 4</span>
-          <span class="phrase"><span class="ph-ic" data-icon="chat"></span>WhatsApp Mom that I'll be late</span>
-          <span class="phrase"><span class="ph-ic" data-icon="translate"></span>Translate this to Hindi</span>
           <span class="phrase" lang="hi"><span class="ph-ic" data-icon="translate"></span>इसे अंग्रेज़ी में ट्रांसलेट करो</span>
           <span class="phrase"><span class="ph-ic" data-icon="clipboard"></span>Summarise this</span>
-          <span class="phrase"><span class="ph-ic" data-icon="question"></span>What's the capital of Peru?</span>
+          <span class="phrase"><span class="ph-ic" data-icon="globe"></span>What's the weather in Delhi this weekend?</span>
           <span class="phrase"><span class="ph-ic" data-icon="image"></span>Who is Narendra Modi?</span>
           <span class="phrase"><span class="ph-ic" data-icon="text"></span>Make this formal</span>
+          <span class="phrase"><span class="ph-ic" data-icon="question"></span>What's in the news today?</span>
         </div>
       </div>
       <p class="say-it-note reveal">The top row runs on your PC, in English and Hindi. The bottom row comes with Glyde AI, with nothing to set up.</p>
+      <p class="motion-row reveal"><button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false">Pause animations</button></p>
     </section>
 
     <!-- ============================== NIGHT: VOICE + PRIVACY ============================== -->
@@ -376,7 +373,7 @@
         </div>
 
         <div class="voice-try reveal">
-          <button class="voice-btn" id="voice-btn" aria-pressed="false"><span class="vb-dot"></span><span class="vb-label">Try the waveform with your voice</span></button>
+          <button class="voice-btn" id="voice-btn" aria-pressed="false"><span class="vb-dot"></span><span class="vb-label">Try the waves with your voice</span></button>
           <p class="micro">Only loudness is measured, in your browser. Nothing is recorded or sent.</p>
         </div>
 
@@ -390,7 +387,7 @@
         <div class="brain" id="brain">
           <div class="brain-copy reveal">
             <p class="kicker"><span class="new-tag">Soon</span>Glyde AI, coming soon</p>
-            <h3 class="brain-title">Ask anything. Write emails and WhatsApps. <em>Even in Hindi.</em></h3>
+            <h3 class="brain-title">Ask anything. Write emails and WhatsApps. <span class="soft">Even in Hindi.</span></h3>
             <p>When a request needs more than your PC, Glyde AI answers it: questions (with a picture when it helps), the news and the weather anywhere, and copied text translated or rewritten. It drafts emails and WhatsApps on the island and asks before opening anything. You always press Send.</p>
             <ul class="brain-points">
               <li><span data-icon="sparkle"></span>Coming soon, as a monthly add-on for Glyde Pro. Nothing to set up: no keys, no sign-up.</li>
@@ -414,7 +411,7 @@
       <section class="privacy" id="privacy" data-section="Privacy">
         <div class="section-head center reveal">
           <p class="kicker">Privacy</p>
-          <h2>Private <em>by design.</em></h2>
+          <h2>Private <span class="soft">by design.</span></h2>
           <p class="lede">An app that sees your music, messages and clipboard has to earn that. Here's how Glyde does.</p>
         </div>
         <div class="privacy-grid">
@@ -430,7 +427,7 @@
     <section class="pricing" id="pricing" data-section="Pricing">
       <div class="section-head center reveal">
         <p class="kicker">Pricing</p>
-        <h2>Free for good. <em>Pro, once.</em></h2>
+        <h2>Free for good. <span class="soft">Pro, once.</span></h2>
         <p class="lede">The island is free. Glyde Pro adds the assistant and the rest, for one payment, after a 14-day free trial. Glyde AI, a monthly add-on for Pro, is coming soon.</p>
         <div class="currency" role="radiogroup" aria-label="Currency">
           <button role="radio" aria-checked="true" data-cur="usd">USD</button>
@@ -498,7 +495,7 @@
     <section class="faq" id="faq" data-section="FAQ">
       <div class="section-head center reveal">
         <p class="kicker">Questions</p>
-        <h2>Good <em>questions.</em></h2>
+        <h2>Good <span class="soft">questions.</span></h2>
       </div>
       <div class="faq-list">
         <details class="reveal">
@@ -507,15 +504,11 @@
         </details>
         <details class="reveal">
           <summary>Should I download it here or from the Microsoft Store?</summary>
-          <div class="faq-a"><p>Glyde Pro and Glyde AI are bought in the Microsoft Store and kept with your Microsoft account, so get Glyde from the Store if you plan to buy them. It installs in a click and keeps itself up to date.</p></div>
+          <div class="faq-a"><p>Glyde Pro and Glyde AI are bought in the Microsoft Store and kept with your Microsoft account, so get Glyde from the Store if you plan to buy them. It installs in a click and keeps itself up to date. There's no account to make: purchases use the Microsoft account you're already signed in with, which is also how they unlock on your other PCs.</p></div>
         </details>
         <details class="reveal">
           <summary>Is there a free trial?</summary>
           <div class="faq-a"><p>Yes. Everything in Glyde Pro is unlocked for the first 14 days. After that, Glyde stays free: the island, music and lyrics, the notices, live scores and the clock are yours for good.</p></div>
-        </details>
-        <details class="reveal">
-          <summary>Do I need to make an account?</summary>
-          <div class="faq-a"><p>No. Purchases go through the Microsoft Store, with the Microsoft account you're already signed in with. That's also how they unlock on your other PCs.</p></div>
         </details>
         <details class="reveal">
           <summary>Which versions of Windows does it run on?</summary>
@@ -538,20 +531,12 @@
           <div class="faq-a"><p>If you code with Claude Code or Codex, Glyde shows each session on the island: what it's doing, when it's done, and when it needs you. Allow or Deny Claude Code's requests right there, and get a soft ping when one is waiting while you're in another window. Before Claude Code does something that can't be undone, like wiping a database or deleting a folder, it waits: the island glows red, Glyde says why, and only the island can allow it. They come with Glyde Pro.</p></div>
         </details>
         <details class="reveal">
-          <summary>Which languages does Glyde understand?</summary>
-          <div class="faq-a"><p>English and Hindi, and it works out which one you're speaking. With Glyde AI, Hinglish requests work too.</p></div>
-        </details>
-        <details class="reveal">
           <summary>Will it get in the way of games or films?</summary>
           <div class="faq-a"><p>No. It hides itself whenever a fullscreen app, game or video is in front (YouTube in your browser included), clicks pass straight through everywhere except the pill, and clicking the pill never steals focus. Glyde's speech model is only loaded while you use it and unloads after ten minutes.</p></div>
         </details>
         <details class="reveal">
           <summary>I have more than one monitor.</summary>
           <div class="faq-a"><p>Pick which display the island sits on in Settings, or let it follow your pointer from screen to screen.</p></div>
-        </details>
-        <details class="reveal">
-          <summary>Is this made by Apple or Microsoft?</summary>
-          <div class="faq-a"><p>Neither. Glyde is an independent app, inspired by the island on phones and built natively for Windows.</p></div>
         </details>
       </div>
     </section>
@@ -584,9 +569,10 @@
       <div class="final-inner">
         <div id="final-island" class="halo-glow" style="--h:70" data-max="1.5" data-fit="400"></div>
         <h2 class="reveal">Get <em class="halo-word">the halo.</em></h2>
-        <p class="lede reveal" style="--d:.1s">Two ways to install. Both free to start.</p>
+        <p class="lede launch-only reveal" style="--d:.1s">Two ways to install. Both free to start.</p>
+        <p class="lede prelaunch-only reveal" style="--d:.1s">Coming soon for Windows 10 and 11. Free to start.</p>
 
-        <div class="get-cards">
+        <div class="get-cards launch-only">
           <a class="get-card reveal" href="#get" data-download>
             <span class="gc-ic" data-icon="download"></span>
             <b>Download for Windows</b>
@@ -602,7 +588,7 @@
         </div>
 
         <div class="prelaunch-only reveal" style="--d:.15s">
-          <p class="waitlist-label">Not out yet. Get one email the day it launches:</p>
+          <p class="waitlist-label">Get one email the day it launches:</p>
           <form class="waitlist" data-waitlist data-source="final" novalidate>
             <label class="sr-only" for="email-final">Email address</label>
             <input id="email-final" name="email" type="email" required placeholder="you@example.com" autocomplete="email">
@@ -619,7 +605,7 @@
   <aside class="dock" aria-label="Get Glyde" hidden>
     <span class="dock-mark" aria-hidden="true"></span>
     <span class="dock-text"><b>Glyde</b><small data-dock-note>Coming soon for Windows</small></span>
-    <a class="btn btn-glow btn-sm" href="#get" data-dock-cta><span>Join the waitlist</span></a>
+    <a class="btn btn-glow btn-sm" href="#get" data-dock-cta><span class="long">Join the waitlist</span><span class="short">Join</span></a>
     <button class="dock-x" type="button" aria-label="Hide this">&times;</button>
   </aside>
 
@@ -635,6 +621,7 @@
         <a href="#get" data-download>Download</a>
         <a href="#get" data-store>Microsoft Store</a>
         <a href="privacy.html">Privacy policy</a>
+        <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false">Pause animations</button>
       </nav>
       <p class="fine">© <span data-year>2026</span> Glyde. An independent app, not affiliated with Apple Inc., Microsoft Corporation or Google LLC. Glyde was formerly called WinIsland. Song titles, artists and people on this page are made up.</p>
     </div>

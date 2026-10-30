@@ -2,9 +2,42 @@
 (function () {
   'use strict';
 
-  const { Island, Director, V, ICON, TRACKS, player, voice, artHTML, faceHTML, reduceMotion, sleep, esc } = window.WI;
+  const { Island, V, ICON, TRACKS, player, voice, artHTML, faceHTML, reduceMotion, sleep, esc } = window.WI;
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+  // ---- Pausing animations --------------------------------------------------------------------
+  // "Pause animations" (by the drifting phrases, and in the footer) stops what moves by itself:
+  // the islands' little stories, the phrases, the motes of light and the page's looping glows.
+  // Remembered on this device. Everything still works when you use it.
+
+  let still = false;
+  try { still = localStorage.getItem('glyde-still') === '1'; } catch (err) { /* storage blocked */ }
+  const directors = [];
+  const whenStillChanges = [];
+  class Director extends window.WI.Director {
+    constructor(...args) {
+      super(...args);
+      directors.push(this);
+      if (still) this.pauseUntil = Infinity;
+    }
+  }
+  // An island left alone for a while after you've used it (forever, while paused).
+  const hold = (director, ms) => { director.pauseUntil = still ? Infinity : Date.now() + ms; };
+
+  function setStill(on, save = true) {
+    still = on;
+    document.documentElement.classList.toggle('still', on);
+    directors.forEach(d => { d.pauseUntil = on ? Infinity : 0; });
+    $$('[data-motion-toggle]').forEach(b => {
+      b.setAttribute('aria-pressed', String(on));
+      b.textContent = on ? 'Play animations' : 'Pause animations';
+    });
+    if (save) try { localStorage.setItem('glyde-still', on ? '1' : '0'); } catch (err) { /* storage blocked */ }
+    whenStillChanges.forEach(fn => fn(on));
+  }
+  $$('[data-motion-toggle]').forEach(b => b.addEventListener('click', () => setStill(!still)));
+  if (reduceMotion) $$('.motion-row').forEach(row => { row.hidden = true; }); // (nothing loops then anyway)
 
   // Links and the waitlist backend live in config.js.
   const CONFIG = window.WINISLAND || {};
@@ -15,34 +48,14 @@
   $$('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
 
   // ---- Download & Store buttons ------------------------------------------------------------
-  // Live links once config.js has them; until then a "Soon" tag, and a click leads to the
-  // nearest waitlist form instead.
-
-  function nudgeWaitlist(from) {
-    const section = from.closest('section');
-    const form = (section && $('[data-waitlist]', section)) || $('#get [data-waitlist]');
-    const input = $('input[type="email"]', form);
-    const message = $('.form-msg', form);
-    form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
-    setTimeout(() => {
-      input.focus({ preventScroll: true });
-      if (!form.classList.contains('done')) message.textContent = 'Not out yet. Leave your email and we’ll tell you the day it is.';
-      form.classList.remove('nudge');
-      void form.offsetWidth;
-      form.classList.add('nudge');
-    }, reduceMotion ? 0 : 450);
-  }
+  // Only shown once config.js has their links: before launch the page offers one thing to do,
+  // the waitlist, rather than buttons that don't work yet.
 
   function wireGetLinks(selector, url, newTab) {
     $$(selector).forEach(link => {
-      if (url) {
-        link.href = url;
-        if (newTab) { link.target = '_blank'; link.rel = 'noopener'; }
-        return;
-      }
-      if (LAUNCHED) { link.style.display = 'none'; return; } // out, just not on this channel yet
-      if (link.matches('.btn, .store-badge, .get-card')) link.insertAdjacentHTML('beforeend', '<em class="soon-tag">Soon</em>');
-      link.addEventListener('click', e => { e.preventDefault(); nudgeWaitlist(link); });
+      if (!url) { link.hidden = true; link.style.display = 'none'; return; }
+      link.href = url;
+      if (newTab) { link.target = '_blank'; link.rel = 'noopener'; }
     });
   }
   wireGetLinks('[data-download]', CONFIG.downloadUrl, false);
@@ -62,6 +75,63 @@
     $$('[data-plan="pro"]').forEach(a => { a.innerHTML = '<span>Get Pro</span>'; a.href = CONFIG.storeUrl || best; });
     $$('[data-plan="ai"]').forEach(a => { a.textContent = 'Get Glyde AI with Pro'; a.href = CONFIG.storeUrl || best; });
   }
+
+  // ---- Radio groups (the songs, the currency) ------------------------------------------------
+  // One Tab stop each, on the chosen one; the arrow keys move between them and choose.
+
+  function radioKeys(group, choose) {
+    const radios = () => $$('[role="radio"]', group);
+    const sync = () => radios().forEach(r => { r.tabIndex = r.getAttribute('aria-checked') === 'true' ? 0 : -1; });
+    group.addEventListener('keydown', e => {
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      const list = radios();
+      const at = list.indexOf(document.activeElement);
+      if (!step || at < 0) return;
+      e.preventDefault();
+      const next = list[(at + step + list.length) % list.length];
+      choose(next);
+      next.focus();
+      sync();
+    });
+    new MutationObserver(sync).observe(group, { subtree: true, attributes: true, attributeFilter: ['aria-checked'] });
+    sync();
+  }
+
+  // ---- "And there's more": the first six, then the rest on asking -------------------------
+
+  const moreGrid = $('#more-grid');
+  const moreToggle = $('.more-toggle');
+  const moreCount = moreGrid.children.length;
+  if (moreCount > 6) {
+    moreToggle.hidden = false;
+    moreToggle.textContent = `Show all ${moreCount}`;
+    moreToggle.addEventListener('click', () => {
+      const all = moreGrid.classList.toggle('all');
+      moreToggle.setAttribute('aria-expanded', String(all));
+      moreToggle.textContent = all ? 'Show fewer' : `Show all ${moreCount}`;
+      if (all) $$('li', moreGrid).slice(6).forEach(li => li.classList.add('in')); // (no waiting to scroll in)
+    });
+  }
+
+  // ---- FAQ: answers close the way they opened ----------------------------------------------
+
+  $$('.faq details').forEach(details => {
+    const summary = $('summary', details);
+    const answer = $('.faq-a', details);
+    let closing = 0;
+    summary.addEventListener('click', e => {
+      if (!details.open || reduceMotion) return;
+      e.preventDefault();
+      if (closing) return;
+      answer.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-6px)' }],
+        { duration: 180, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'forwards' });
+      closing = setTimeout(() => {
+        details.open = false;
+        answer.getAnimations().forEach(a => a.cancel());
+        closing = 0;
+      }, 180);
+    });
+  });
 
   // ---- Content shared by several islands ---------------------------------------------------
 
@@ -186,7 +256,7 @@
 
   function navMenu() {
     const links = SECTIONS.slice(1).filter(s => s.menu !== false).map(s =>
-      `<a href="#${s.id}" class="${s.cta ? 'cta' : ''}${s.id === currentSection.id ? ' here' : ''}">` +
+      `<a href="#${s.id}" class="${s.cta ? 'cta' : ''}${s.id === currentSection.id ? ' here" aria-current="location' : ''}">` +
       `<span class="m-ic">${ICON[s.icon]}</span><span><b>${s.label}</b><small>${s.sub}</small></span></a>`
     ).join('');
     return { key: 'nav-menu', shape: [420, 202, 30], cls: 'v-menu', html: links };
@@ -210,6 +280,29 @@
   });
   islandActions(nav);
   navIsland.el.addEventListener('click', e => { if (e.target.closest('a')) nav.setHover(false); });
+
+  // From the keyboard too: Tab onto the island opens the sections (Enter or Space toggles them,
+  // Escape closes them), and they close again once focus moves on.
+  const navEl = navIsland.el;
+  navEl.tabIndex = 0;
+  navEl.setAttribute('aria-label', 'Sections');
+  navEl.setAttribute('aria-expanded', 'false');
+  nav.onHover = on => navEl.setAttribute('aria-expanded', String(on));
+  let closedByKey = false; // (Escape hands focus back to the island: that shouldn't open it again)
+  navEl.addEventListener('focus', () => {
+    if (closedByKey) { closedByKey = false; return; }
+    if (navEl.matches(':focus-visible')) nav.setHover(true);
+  });
+  navEl.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target === navEl) {
+      e.preventDefault();
+      nav.setHover(!nav.hovered);
+    } else if (e.key === 'Escape' && nav.hovered) {
+      nav.setHover(false);
+      if (document.activeElement !== navEl) { closedByKey = true; navEl.focus(); }
+    }
+  });
+  navEl.addEventListener('focusout', e => { if (nav.hovered && !navEl.contains(e.relatedTarget)) nav.setHover(false); });
 
   const topbar = $('.topbar');
   const sectionObserver = new IntersectionObserver(entries => {
@@ -260,7 +353,7 @@
   };
 
   $$('.try .chip').forEach(chip => chip.addEventListener('click', () => {
-    hero.pauseUntil = Date.now() + 8000;
+    hold(hero, 8000);
     hero.setHover(false);
     hero.run(tagged(chip.dataset.demo));
   }));
@@ -390,7 +483,7 @@
   };
   timers.onAction = act => {
     if (act === 'timer-stop' || act === 'timer-snooze') {
-      timers.pauseUntil = Date.now() + 2500;
+      hold(timers, 2500);
       timers.stop();
     }
   };
@@ -534,6 +627,7 @@
   }
   player.on(type => { if (type !== 'tick') paintMusicSection(); });
   paintMusicSection();
+  radioKeys(albums, button => { player.select(Number(button.dataset.i)); player.play(); });
 
   $('#match-colors').addEventListener('change', e => {
     player.setMatchColors(e.target.checked);
@@ -561,7 +655,7 @@
   };
   $$('.say[data-say]').forEach(button => button.addEventListener('click', () => {
     stopMic(false);
-    siro.pauseUntil = Date.now() + 9000;
+    hold(siro, 9000);
     siro.run(sayScript(button.dataset.say));
   }));
   siro.autoplay(Object.keys(SAY).filter(k => k !== 'help').map(sayScript), { gap: 1800, start: 900 });
@@ -609,13 +703,13 @@
     try { await ASK[name](ctx); } finally { if (ctx.alive()) askButton(name)?.classList.remove('active'); }
   };
   $$('.say[data-ask]').forEach(button => button.addEventListener('click', () => {
-    brain.pauseUntil = Date.now() + 12000;
+    hold(brain, 12000);
     brain.run(askScript(button.dataset.ask));
   }));
   brain.onAction = act => {
-    if (act === 'draft-cancel') { brain.pauseUntil = Date.now() + 5000; brain.stop(); }
+    if (act === 'draft-cancel') { hold(brain, 5000); brain.stop(); }
     if (act === 'draft-open') {
-      brain.pauseUntil = Date.now() + 8000;
+      hold(brain, 8000);
       const reply = brain.opened || 'Opened.';
       brain.run(async ({ show, wait }) => { show(V.siroAnswer('Yes', reply)); await wait(3000); });
     }
@@ -643,7 +737,7 @@
     keys.classList.add('pressed');
     setTimeout(() => keys.classList.remove('pressed'), 180);
     const director = siro.visible ? siro : nav;
-    director.pauseUntil = Date.now() + 8000;
+    hold(director, 8000);
     director.setHover(false);
     director.run(greet);
   }
@@ -653,7 +747,7 @@
     if (e.ctrlKey && e.altKey && e.code === 'KeyS') { e.preventDefault(); summonGlyde(); }
   });
 
-  // "Try the waveform with your voice": loudness only, measured in the browser.
+  // "Try the waves with your voice": loudness only, measured in the browser.
   const voiceButton = $('#voice-btn');
   const voiceLabel = $('.vb-label', voiceButton);
   let mic = null;
@@ -681,7 +775,7 @@
       });
     } catch (err) {
       voiceLabel.textContent = 'The microphone isn’t available here';
-      setTimeout(() => { voiceLabel.textContent = 'Try the waveform with your voice'; }, 2600);
+      setTimeout(() => { voiceLabel.textContent = 'Try the waves with your voice'; }, 2600);
     }
   }
 
@@ -693,13 +787,13 @@
     mic = null;
     voice.source = null;
     voiceButton.setAttribute('aria-pressed', 'false');
-    voiceLabel.textContent = 'Try the waveform with your voice';
+    voiceLabel.textContent = 'Try the waves with your voice';
     if (answer) {
-      siro.pauseUntil = Date.now() + 6000;
+      hold(siro, 6000);
       siro.run(async ({ show, wait }) => {
         show(V.siroThinking());
         if (!await wait(500)) return;
-        show(V.siroAnswer('…', 'That waveform was you. In the app, I’d act on it.'));
+        show(V.siroAnswer('…', 'Those waves were you. In the app, I’d act on it.'));
         await wait(3400);
       });
     }
@@ -707,9 +801,11 @@
 
   voiceButton.addEventListener('click', () => (mic ? stopMic(true) : startMic()));
 
-  // Stars over the night sky.
+  // Stars over the night sky, twinkling (and the aurora drifting) only while it's on screen.
   const stars = $('.stars');
-  stars.innerHTML = Array.from({ length: 150 }, () => {
+  const night = $('.night');
+  new IntersectionObserver(entries => { night.classList.toggle('away', !entries[entries.length - 1].isIntersecting); }).observe(night);
+  stars.innerHTML = Array.from({ length: 70 }, () => {
     const z = (Math.random() * 1.6 + .8).toFixed(1);
     return `<i style="left:${(Math.random() * 100).toFixed(2)}%;top:${(Math.random() * 100).toFixed(2)}%;--z:${z}px;` +
       `--t:${(2 + Math.random() * 4).toFixed(1)}s;--dl:${(-Math.random() * 6).toFixed(1)}s;--o:${(.5 + Math.random() * .5).toFixed(2)}"></i>`;
@@ -738,6 +834,7 @@
   $$('.currency button').forEach(b => b.addEventListener('click', () => setCurrency(b.dataset.cur)));
   const zone = (Intl.DateTimeFormat().resolvedOptions().timeZone || '');
   setCurrency(/Kolkata|Calcutta/.test(zone) ? 'inr' : 'usd', false);
+  radioKeys($('.currency'), button => setCurrency(button.dataset.cur));
 
   // ---- Waitlist ------------------------------------------------------------------------------
 
@@ -912,16 +1009,19 @@
         const x = ((m.offset % m.unit) + m.unit) % m.unit;
         m.track.style.transform = `translate3d(${-x}px, 0, 0)`;
       });
-      raf = marquees.some(m => m.visible) ? requestAnimationFrame(frame) : 0;
+      raf = !still && marquees.some(m => m.visible) ? requestAnimationFrame(frame) : 0;
+    };
+    const start = () => {
+      if (raf || still || !marquees.some(m => m.visible)) return;
+      lastFrame = performance.now();
+      lastScroll = scrollY;
+      raf = requestAnimationFrame(frame);
     };
     const watcher = new IntersectionObserver(entries => {
       entries.forEach(entry => { marquees.find(m => m.el === entry.target).visible = entry.isIntersecting; });
-      if (!raf && marquees.some(m => m.visible)) {
-        lastFrame = performance.now();
-        lastScroll = scrollY;
-        raf = requestAnimationFrame(frame);
-      }
+      start();
     });
+    whenStillChanges.push(start);
     marquees.forEach(m => watcher.observe(m.el));
     measureMarquees();
     addEventListener('resize', measureMarquees);
@@ -942,7 +1042,7 @@
     $('[data-dock-note]', dock).textContent = 'Free for Windows 10 & 11';
     const cta = $('[data-dock-cta]', dock);
     cta.href = CONFIG.downloadUrl || CONFIG.storeUrl;
-    cta.innerHTML = '<span>Download free</span>';
+    cta.innerHTML = '<span class="long">Download free</span><span class="short">Get</span>';
   }
   $('.dock-x', dock).addEventListener('click', () => {
     dockClosed = true;
@@ -1008,13 +1108,21 @@
   }, { rootMargin: '0px 0px -6% 0px', threshold: 0.06 });
   $$('.reveal').forEach(el => revealer.observe(el));
 
-  $$('.card').forEach(el => el.addEventListener('pointermove', e => {
-    const r = el.getBoundingClientRect();
-    el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-    el.style.setProperty('--my', (e.clientY - r.top) + 'px');
-  }));
+  $$('.card').forEach(el => {
+    let pending = 0;
+    el.addEventListener('pointermove', e => {
+      if (pending) return;
+      pending = requestAnimationFrame(() => {
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        pending = 0;
+      });
+    });
+  });
 
   // ---- Motes of light drifting up the page ---------------------------------------------------
+  // Only while the hero or the final call is on screen (fading out in between), and never while paused.
 
   (function motes() {
     const canvas = $('#motes');
@@ -1072,12 +1180,27 @@
       raf = requestAnimationFrame(frame);
     }
 
+    const showing = new Set();
+    function update() {
+      const on = showing.size > 0 && !still && !document.hidden;
+      canvas.classList.toggle('off', !on);
+      if (on && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+      if (!on && raf) { cancelAnimationFrame(raf); raf = 0; }
+    }
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (entry.isIntersecting) showing.add(entry.target); else showing.delete(entry.target); });
+      update();
+    }).observe($('.hero'));
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (entry.isIntersecting) showing.add(entry.target); else showing.delete(entry.target); });
+      update();
+    }).observe($('.final'));
+
     resize();
     addEventListener('resize', resize);
-    document.addEventListener('visibilitychange', () => {
-      cancelAnimationFrame(raf);
-      if (!document.hidden) { last = performance.now(); raf = requestAnimationFrame(frame); }
-    });
-    raf = requestAnimationFrame(frame);
+    document.addEventListener('visibilitychange', update);
+    whenStillChanges.push(update);
   })();
+
+  setStill(still, false); // (as left last time)
 })();
