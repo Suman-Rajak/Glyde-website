@@ -704,3 +704,14 @@ body::after {
 @media (prefers-reduced-motion: reduce) { .bc-pointer, .bc-results, .bc-row { transition: none; } }
 .screen.fx-device { aspect-ratio: 16 / 7.4; }
 @media (max-width: 860px) { .screen.fx-device { aspect-ratio: 16 / 10; } }
+
+/* ============================== PRICING: each plan's limits, in the same two rows on every card ============================== */
+.plan-limits { margin: 16px 0 0; padding: 10px 12px; border-radius: 14px; background: rgba(13, 16, 36, .045); display: grid; gap: 6px; }
+.plan-limits div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.plan-limits dt { font-size: .78rem; color: var(--ink-3); }
+.plan-limits dd { margin: 0; font-size: .84rem; font-weight: 650; color: var(--ink); text-align: right; }
+.plan-limits-note { margin-top: 6px; font-size: .75rem; color: var(--ink-3); min-height: 1.2em; }
+.plan.pro .plan-limits, .plan.ai .plan-limits { background: rgba(255, 255, 255, .07); }
+.plan.pro .plan-limits dt, .plan.ai .plan-limits dt, .plan.pro .plan-limits-note, .plan.ai .plan-limits-note { color: rgba(255, 255, 255, .55); }
+.plan.pro .plan-limits dd, .plan.ai .plan-limits dd { color: #fff; }
+.plans.four .plan ul { margin-top: 14px; }
