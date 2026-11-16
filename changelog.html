@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Changelog · Glyde</title>
+  <meta name="description" content="What's new in Glyde, the dynamic island for Windows.">
+  <meta name="theme-color" content="#07061a">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="polish.css">
+  <style>
+    /* The changelog: dark, like the top of the home page; a column of releases, newest first, each with its date beside it. */
+    body { background: #07061a; color: #f2f0ff; }
+    body::before {
+      content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background: radial-gradient(60% 40% at 50% 0, rgba(124, 108, 255, .28), transparent 70%);
+    }
+    .cl-dots { position: absolute; inset: 0 0 auto; height: 520px; z-index: -1; pointer-events: none;
+      background-image: radial-gradient(circle at center, rgba(200, 190, 255, .26) 1.1px, transparent 1.7px); background-size: 24px 24px;
+      -webkit-mask-image: radial-gradient(60% 70% at 50% 0, #000 20%, transparent 75%); mask-image: radial-gradient(60% 70% at 50% 0, #000 20%, transparent 75%); }
+    .topbar .brand { color: #fff; }
+    .topbar .tb-links a { color: rgba(238, 240, 255, .72); }
+    .topbar .tb-links a:hover, .topbar .tb-links a[aria-current="page"] { background: rgba(255, 255, 255, .09); color: #fff; }
+    .topbar .btn-dark { background: #fff; color: #0d1024; }
+    .topbar::before { background: linear-gradient(180deg, rgba(8, 10, 28, .75), rgba(8, 10, 28, 0)); }
+    @media (max-width: 1080px) { .tb-links.always { display: flex; } .tb-links.always a:not([aria-current]) { display: none; } }
+
+    .cl { position: relative; max-width: 980px; margin: 0 auto; padding: 150px var(--gutter) 100px; }
+    .cl-head { max-width: 640px; }
+    .cl-head .kicker { color: #c9c0ff; }
+    .cl-head h1 { font-size: clamp(2.75rem, 6vw, 4.25rem); letter-spacing: -.045em; color: #fff; }
+    .cl-head p { margin-top: 14px; font-size: 1.125rem; color: rgba(238, 240, 255, .66); }
+
+    .release { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px; padding: 44px 0; border-top: 1px solid rgba(255, 255, 255, .08); }
+    .release:first-of-type { margin-top: 56px; }
+    .release time { position: sticky; top: 96px; align-self: start; font-size: .9375rem; font-weight: 600; color: rgba(238, 240, 255, .55); }
+    .release time small { display: block; margin-top: 4px; font-size: .8125rem; font-weight: 500; color: rgba(238, 240, 255, .38); }
+    .release h2 { font-size: clamp(1.4rem, 2.4vw, 1.75rem); letter-spacing: -.025em; color: #fff; }
+    .release > div > p { margin-top: 10px; color: rgba(238, 240, 255, .7); max-width: 60ch; }
+    .release ul { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 12px; }
+    .release li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 14px; align-items: baseline; color: rgba(238, 240, 255, .82); font-size: .975rem; line-height: 1.55; }
+    .tag { justify-self: start; padding: 2px 9px; border-radius: 999px; font-size: .6875rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .tag.new { background: rgba(124, 108, 255, .2); color: #c9c0ff; }
+    .tag.better { background: rgba(82, 242, 223, .13); color: #8ef0e4; }
+    .tag.fixed { background: rgba(255, 179, 64, .14); color: #ffd08a; }
+    .tag.soon { background: rgba(255, 255, 255, .08); color: rgba(238, 240, 255, .7); }
+    @media (max-width: 720px) {
+      .release { grid-template-columns: 1fr; gap: 10px; }
+      .release time { position: static; }
+      .release li { grid-template-columns: 1fr; gap: 4px; }
+    }
+    .footer { background: #07061a; }
+    .footer-inner { border-top-color: rgba(255, 255, 255, .08); }
+    .footer .brand, .footer nav a { color: rgba(238, 240, 255, .8); }
+    .footer nav a:hover { color: #fff; }
+    .footer .brand-name, .topbar .brand-name { color: #fff; }
+    @media (max-width: 480px) { .tb-links.always { display: none !important; } .topbar .btn-sm { padding: 0 14px; } }
+    .footer .fine { color: rgba(238, 240, 255, .45); }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="cl-dots" aria-hidden="true"></div>
+
+  <header class="topbar on-night">
+    <div class="tb-side">
+      <a class="brand" href="./" aria-label="Glyde home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">Glyde</span>
+      </a>
+      <nav class="tb-links" aria-label="Main">
+        <a href="./#features">Features</a>
+        <a href="./#point">Point &amp; Ask</a>
+        <a href="./#pricing">Pricing</a>
+      </nav>
+    </div>
+    <div class="tb-side right">
+      <nav class="tb-links always" aria-label="More">
+        <a href="./#faq">FAQ</a>
+        <a href="changelog.html" aria-current="page">Changelog</a>
+      </nav>
+      <a class="btn btn-dark btn-sm" href="./#get">Join the waitlist</a>
+    </div>
+  </header>
+
+  <main class="cl" id="main">
+    <header class="cl-head">
+      <p class="kicker">Changelog</p>
+      <h1>What’s new in Glyde</h1>
+      <p>Every change worth knowing about, newest first.</p>
+    </header>
+
+    <article class="release">
+      <time datetime="2026-11-15">15 November 2026</time>
+      <div>
+        <h2>Eyes, the thin line, and a tidier Settings</h2>
+        <p>A new default character, a second way for the island to sit at the top, and Settings in eight clear tabs.</p>
+        <ul>
+          <li><span class="tag new">New</span><span>Eyes: two simple eyes that blink, glance about and follow what’s happening. Glyde’s new default character.</span></li>
+          <li><span class="tag new">New</span><span>The island can now be a notch or a thin line over the top edge of the screen.</span></li>
+          <li><span class="tag new">New</span><span>The resting pill shows glances, like your next meeting, and a second bubble beside it.</span></li>
+          <li><span class="tag better">Better</span><span>Settings is organised into eight tabs.</span></li>
+          <li><span class="tag better">Better</span><span>The music’s light now runs to the island’s edges.</span></li>
+          <li><span class="tag better">Better</span><span>Point &amp; Ask reads the text on your screen, so its answers are more exact.</span></li>
+          <li><span class="tag fixed">Fixed</span><span>Glyde always finishes quitting when you close it.</span></li>
+          <li><span class="tag soon">Soon</span><span>Glyde AI and Glyde AI Max, by the month, with a lower price if you own Glyde Pro.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="release">
+      <time datetime="2026-11-09">9 November 2026</time>
+      <div>
+        <h2>Help in your browser</h2>
+        <ul>
+          <li><span class="tag soon">Soon</span><span>Browser control in Chrome and Edge, with the Glyde extension, for Glyde AI.</span></li>
+          <li><span class="tag better">Better</span><span>Stopping an answer clears the island straight away.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="release">
+      <time datetime="2026-11-06">6 November 2026<small>and 5 November</small></time>
+      <div>
+        <h2>A new look for the assistant</h2>
+        <p>Glyde now shows what it’s doing at a glance, and lights the island from below while it listens, thinks and talks.</p>
+        <ul>
+          <li><span class="tag new">New</span><span>An orb shows the assistant at work: a dot while it listens, a turning ring while it thinks, bars while it talks.</span></li>
+          <li><span class="tag new">New</span><span>Eight natural voices that run on your PC. Pick one from tiles with pixel faces.</span></li>
+          <li><span class="tag new">New</span><span>The music pill shows the lyrics, and the island’s light moves with the beat.</span></li>
+          <li><span class="tag new">New</span><span>Point &amp; Ask works sums out on a handwritten board beside your screen.</span></li>
+          <li><span class="tag better">Better</span><span>Point &amp; Ask draws its circles, arrows and labels more precisely.</span></li>
+          <li><span class="tag better">Better</span><span>Esc stops the assistant, and the chimes are softer.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="release">
+      <time datetime="2026-10-30">30 October 2026</time>
+      <div>
+        <h2>Point &amp; Ask, and a faster menu bar</h2>
+        <ul>
+          <li><span class="tag new">New</span><span>Point &amp; Ask: ask about files, a box you draw, or text you’ve selected, with answers saved to Notes.</span></li>
+          <li><span class="tag new">New</span><span>Your coding agents on the island in Glyde Pro, with risky moves held until you allow them.</span></li>
+          <li><span class="tag new">New</span><span>Clear all on the file shelf, with Undo. Click a note to read it in full.</span></li>
+          <li><span class="tag better">Better</span><span>The menu bar answers at once and behaves like a Mac’s.</span></li>
+          <li><span class="tag better">Better</span><span>Calmer motion, easier to interrupt.</span></li>
+          <li><span class="tag fixed">Fixed</span><span>“Hey Glyde” is heard every time, and the island stays over other windows.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="release">
+      <time datetime="2026-10-23">23 October 2026<small>to 29 October</small></time>
+      <div>
+        <h2>Glyde Pro, and ready for the Microsoft Store</h2>
+        <ul>
+          <li><span class="tag new">New</span><span>Glyde Pro: one payment, after a 14-day free trial.</span></li>
+          <li><span class="tag new">New</span><span>A teleprompter under your webcam, and a camera mirror.</span></li>
+          <li><span class="tag new">New</span><span>A focus timer, and tutorials to get started.</span></li>
+          <li><span class="tag new">New</span><span>Glyde can be a fox, a penguin or a robot.</span></li>
+          <li><span class="tag new">New</span><span>A welcome for new users that explains Windows’ permissions before it asks.</span></li>
+          <li><span class="tag better">Better</span><span>The island hides over browsers in full screen.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="release">
+      <time datetime="2026-10-22">22 October 2026<small>from 17 October</small></time>
+      <div>
+        <h2>Live activities and lyrics</h2>
+        <ul>
+          <li><span class="tag new">New</span><span>Live activities: scroll over the island to switch between them.</span></li>
+          <li><span class="tag new">New</span><span>Synced lyrics, and better covers for YouTube and Amazon Music.</span></li>
+          <li><span class="tag new">New</span><span>Screenshots and file copies on the island.</span></li>
+          <li><span class="tag new">New</span><span>Notifications get a tab of their own, and the clipboard keeps what you bookmark.</span></li>
+          <li><span class="tag better">Better</span><span>A redesigned Settings.</span></li>
+          <li><span class="tag fixed">Fixed</span><span>The island no longer slips behind windows.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="release">
+      <time datetime="2026-10-16">16 October 2026<small>from 6 October</small></time>
+      <div>
+        <h2>The first Glyde</h2>
+        <p>The island arrives at the top of Windows.</p>
+        <ul>
+          <li><span class="tag new">New</span><span>Now playing, with the music’s colours.</span></li>
+          <li><span class="tag new">New</span><span>Volume, brightness, battery, Bluetooth, and the microphone and camera dot.</span></li>
+          <li><span class="tag new">New</span><span>Clipboard history, the file shelf, and timers, alarms and reminders.</span></li>
+          <li><span class="tag new">New</span><span>The voice assistant, with a push-to-talk shortcut and a wake word.</span></li>
+          <li><span class="tag new">New</span><span>A Mac-style notch and menu bar.</span></li>
+        </ul>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">Glyde</span></a>
+      <nav aria-label="Footer">
+        <a href="./#features">Features</a>
+        <a href="./#pricing">Pricing</a>
+        <a href="./#faq">FAQ</a>
+        <a href="changelog.html">Changelog</a>
+        <a href="privacy.html">Privacy policy</a>
+      </nav>
+      <p class="fine">© 2026 Glyde. An independent app, not affiliated with Apple Inc., Microsoft Corporation or Google LLC.</p>
+    </div>
+  </footer>
+  <script>
+    // The bar gets its backdrop once you scroll.
+    (function () {
+      var bar = document.querySelector('.topbar');
+      var update = function () { bar.classList.toggle('scrolled', scrollY > 20); };
+      addEventListener('scroll', update, { passive: true }); update();
+    })();
+  </script>
+</body>
+</html>

@@ -48,6 +48,7 @@
     globe: stroke('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>'),
     fullscreen: stroke('<path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/>'),
     moon: stroke('<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'),
+    sticky: stroke('<path d="M5 4.5h14v9.5l-5 5.5H5z"/><path d="M14 20v-5.5h5"/>'),
     grid: stroke('<rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/>'),
     tag: stroke('<path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-6.2 6.2a1.5 1.5 0 0 1-2.1 0l-8.7-7.9z"/><circle cx="8" cy="8" r="1.4"/>'),
     question: stroke('<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.8"/><path d="M12 17.2h.01"/>'),
@@ -71,6 +72,11 @@
     menu: stroke('<rect x="2.5" y="4" width="19" height="16" rx="3"/><path d="M2.5 8.5h19M6 6.3h.01M8.5 6.3h3"/>'),
     target: stroke('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/>'),
     bookmark: stroke('<path d="M7 3.5h10a1 1 0 0 1 1 1v16l-6-4-6 4v-16a1 1 0 0 1 1-1z"/>'),
+    robot: stroke('<rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4.5V8M9.5 13h.01M14.5 13h.01M9.5 16h5"/><circle cx="12" cy="4" r="1"/>'),
+    terminal: stroke('<rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="m7.5 10 2.5 2-2.5 2M12.5 15h4"/>'),
+    user: stroke('<circle cx="12" cy="8.5" r="3.6"/><path d="M5 19.5a7 7 0 0 1 14 0"/>'),
+    copy: stroke('<rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/>'),
+    warn: filled('<path d="M12 3.2 22 20H2L12 3.2z"/><path d="M12 9.5v5M12 17.2v.1" stroke="#000" stroke-width="2" stroke-linecap="round"/>'),
     lyrics: stroke('<path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 9 19.2l-4.5.3z"/><path d="M9 10.5h6M9 13.5h3.5"/>'),
   };
 
@@ -297,7 +303,7 @@
 
   // ---- The island ---------------------------------------------------------------------------
 
-  const IDLE = [190, 34, 17]; // at rest: Glyde, the weather and the time, as the app's resting pill
+  const IDLE = [150, 32, 16]; // at rest: Glyde, the weather and the time, as the app's resting pill
 
   class Island {
     constructor(stage, options = {}) {
@@ -471,11 +477,15 @@
   // Glyde, the app's little pixel ghost (its own pictures, in glyde/): calm (blinking now and then), happy, thinking (a
   // ? by its head) or speaking (sound lines by its mouth).
   const FACES = { calm: 'idle', happy: 'happy', thinking: 'thinking', speaking: 'speaking' };
+  function orbHTML(mode = 'calm') {
+    const bars = mode === 'speaking' ? '<i></i><i></i><i></i><i></i>' : '';
+    return `<span class="orb ${mode}" aria-hidden="true"><span class="orb-ring"></span><span class="orb-dot"></span>${bars}</span>`;
+  }
+
+  // The character, as the app's default now: two eyes (Characters/Eyes). They blink, glance about, squint when happy,
+  // look up while thinking and bob while speaking.
   function faceHTML(look = 'calm') {
-    const mark = look === 'thinking' ? '<img class="face-mark q" src="glyde/question.png" alt="">'
-      : look === 'speaking' ? '<img class="face-mark s" src="glyde/sound.png" alt="">' : '';
-    const blink = look === 'calm' ? '<img class="face-blink" src="glyde/blink.png" alt="">' : '';
-    return `<span class="face ${look}" aria-hidden="true"><img src="glyde/${FACES[look]}.png" alt="">${blink}${mark}</span>`;
+    return `<span class="face eyes ${look}" aria-hidden="true"><i></i><i></i></span>`;
   }
 
   // The time as Windows shows it on the resting island: "10:54" with a small "pm" (or 24 hours, where that's the way).
@@ -492,11 +502,13 @@
   // icons; then, past a line, Ask.
   const TABS = [
     () => (player.playing ? [ICON.note, 'Now playing'] : [ICON.clock, 'Clock']),
-    () => [ICON.target, 'Focus'],
-    () => [ICON.camera, 'Prompter'],
+    () => [ICON.robot, 'Agents'],
+    () => [ICON.bell, 'Notifications'],
     () => [ICON.clipboard, 'Clipboard'],
-    () => [ICON.tray, 'Shelf'],
-    () => [ICON.stopwatch, 'Timers'],
+    () => [ICON.file, 'Shelf'],
+    () => [ICON.sticky, 'Notes'],
+    () => [ICON.moon, 'Focus'],
+    () => [ICON.camera, 'Prompter'],
   ];
   function tabsHTML(active) {
     const tab = (make, i) => {
@@ -518,12 +530,14 @@
         shownTrack = player.index;
         const slot = q('.art-slot');
         if (slot) slot.innerHTML = artHTML(t, slot.dataset.size || 'sm');
-        if (q('.me-title')) {
-          q('.me-title').textContent = t.title;
-          q('.me-artist').textContent = t.artist;
-          q('.me-src').textContent = t.source;
-        }
+        if (q('.me-title')) q('.me-title').textContent = t.title;
+        if (q('.me-artist')) q('.me-artist').textContent = t.artist;
+        if (q('.me-src')) q('.me-src').textContent = t.source;
       }
+      el.style.setProperty('--mc', t.colors[0]);
+      el.style.setProperty('--mc2', t.colors[1] || t.colors[0]);
+      const ring = q('.ring-fg');
+      if (ring) ring.style.strokeDasharray = `${(100 * player.position / t.duration).toFixed(1)} 100`;
       if (q('.me-fill')) {
         q('.me-fill').style.width = (100 * player.position / t.duration).toFixed(2) + '%';
         q('.me-el').textContent = fmt(player.position);
@@ -540,6 +554,8 @@
   }
 
   const bars = n => `<div class="bars">${'<i></i>'.repeat(n)}</div>`;
+  // The app's level meter: a few columns of dots, lit from the bottom with the music, in its colour.
+  const DOTMETER = '<span class="eqbars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>';
 
   // Charging, how long till it's full, as the app says it ("Full in 1h 24m").
   const fullIn = percent => {
@@ -597,7 +613,7 @@
     // At rest: Glyde at the left, blinking now and then; the weather and the time at the right.
     idle: () => ({
       key: 'idle', shape: IDLE, cls: 'v-idle',
-      html: `${faceHTML('calm')}<span class="idle-right"><span class="idle-wx">${weatherIcon()}<span>24°</span></span><b class="idle-time"></b></span>`,
+      html: `${faceHTML('calm')}<b class="idle-time"></b>`,
       mount: el => {
         const time = el.querySelector('.idle-time');
         const update = () => { time.innerHTML = clockHTML(); };
@@ -608,18 +624,21 @@
     }),
 
     mediaCompact: () => ({
-      key: 'media-compact', shape: [250, 34, 17], cls: 'v-mc',
-      html: `<div class="art-slot" data-size="sm"></div>${bars(4)}`,
+      key: 'media-compact', shape: [400, 34, 17], cls: 'v-mc2',
+      html: `<span class="mc-cover"><svg class="mc-ring" viewBox="0 0 30 30" aria-hidden="true"><circle class="ring-bg" cx="15" cy="15" r="13.5"/>` +
+        `<circle class="ring-fg" cx="15" cy="15" r="13.5" pathLength="100"/></svg><span class="art-slot" data-size="xs"></span></span>` +
+        `<span class="mc-title"><span class="mc-note">♪</span><span class="me-title"></span></span>${DOTMETER}` +
+        `<span class="me-artist" hidden></span><small class="me-src" hidden></small>`,
       mount: bindMedia,
     }),
 
     mediaExpanded: (withTabs = false) => ({
       key: 'media-expanded' + (withTabs ? '-tabs' : ''),
-      shape: withTabs ? [420, 206, 38] : [420, 172, 38],
-      cls: 'v-me' + (withTabs ? ' with-tabs' : ''),
-      html: (withTabs ? tabsHTML(0) : '') +
+      shape: withTabs ? [440, 222, 28] : [440, 186, 28],
+      cls: 'v-me2' + (withTabs ? ' with-tabs' : ''),
+      html: `<span class="v-band" aria-hidden="true"></span>` + (withTabs ? tabsHTML(0) : '') +
         `<div class="me-top"><div class="art-slot" data-size="lg"></div>` +
-        `<div class="me-meta"><b class="me-title"></b><span class="me-artist"></span><small class="me-src"></small></div>${bars(4)}</div>` +
+        `<div class="me-meta"><b class="me-title"></b><span class="me-artist"></span><small class="me-src"></small></div>${DOTMETER}</div>` +
         `<div class="me-progress"><span class="me-el">0:00</span><div class="me-track"><i class="me-fill"></i></div><span class="me-rem">-0:00</span></div>` +
         `<div class="me-controls"><button class="ib" data-act="prev" aria-label="Previous">${ICON.prev}</button>` +
         `<button class="ib big" data-act="toggle" aria-label="Pause">${ICON.pause}</button>` +
@@ -656,7 +675,7 @@
     // The Focus tab: how long, and Start (a tomato red, as the app's).
     focus: () => ({
       key: 'focus', shape: [420, 168, 32], cls: 'v-focus with-tabs',
-      html: tabsHTML(1) + `<div class="fc-body"><div class="fc-dial"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/></svg><b>25:00</b></div>` +
+      html: tabsHTML(6) + `<div class="fc-body"><div class="fc-dial"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/></svg><b>25:00</b></div>` +
         `<div class="fc-side"><b class="fc-phase">Focus</b><div class="fc-lengths"><span>15</span><span class="on">25</span><span>50</span><span>90</span><small>min</small></div>` +
         `<div class="fc-start"><span class="fc-btn">${ICON.play}Start</span><small>5 min breaks</small></div></div></div>`,
     }),
@@ -664,7 +683,7 @@
     // The Prompter tab: the camera's mirror, and the script with its speed and Start.
     prompter: () => ({
       key: 'prompter', shape: [440, 174, 32], cls: 'v-prompter with-tabs',
-      html: tabsHTML(2) + `<div class="pr-body"><div class="pr-mirror">${ICON.camera}<span>Show my camera</span></div>` +
+      html: tabsHTML(7) + `<div class="pr-body"><div class="pr-mirror">${ICON.camera}<span>Show my camera</span></div>` +
         `<div class="pr-side"><p class="pr-script">Good morning, everyone, and thanks for joining. Today I want to walk you through what we shipped this month, and what's next.</p>` +
         `<div class="pr-row"><span class="pr-btn">${ICON.clipboard}Paste</span><span class="pr-speed">−<b>1×</b>+</span><span class="pr-btn start">${ICON.play}Start</span></div></div></div>`,
     }),
@@ -729,56 +748,48 @@
     // Listening, as the app: Glyde, its waves of light following the voice, and your words as you say them (when there
     // are any to show); the island's edge glows cool, sky and aqua.
     siroListening: (heard = '') => ({
-      key: 'siro-listen' + (heard ? '-words' : ''), shape: heard ? [420, 70, 24] : [280, 40, 20],
-      cls: 'v-siro listening' + (heard ? ' words' : ''),
-      html: `${faceHTML('calm')}<div class="listen"><canvas class="waves" aria-hidden="true"></canvas>${heard ? '<span class="heard-live"></span>' : ''}</div>` +
-        `<span class="siro-corner close" aria-hidden="true">${ICON.x}</span>`,
-      mount: (el, island) => {
-        island.el.classList.add('edge-listen');
-        const stopWaves = mountWaves(el.querySelector('.waves'), 'live');
-        const live = el.querySelector('.heard-live');
-        const words = heard.split(' ');
+      key: 'siro-listen' + (heard ? '-words' : ''), shape: [400, 92, 28], cls: 'v-as listening',
+      html: `<span class="v-light" aria-hidden="true"></span>${orbHTML('listening')}` +
+        `<div class="as-mid"><b class="as-heard">${heard ? '' : 'Listening…'}</b></div>` +
+        `<span class="as-btn" aria-hidden="true">${ICON.x}</span>`,
+      mount: el => {
+        const live = el.querySelector('.as-heard');
+        const dot = el.querySelector('.orb');
+        const words = heard ? heard.split(' ') : [];
         const started = performance.now();
-        const timer = live && setInterval(() => {
-          const said = reduceMotion ? words.length : Math.min(words.length, Math.floor((performance.now() - started) / 240) + 1);
-          live.textContent = words.slice(0, said).join(' ');
-        }, 60);
-        return () => {
-          stopWaves();
-          clearInterval(timer);
-          island.el.classList.remove('edge-listen');
+        let raf = 0;
+        // The words come in as they're heard, the newest one still faint; the dot swells with your voice.
+        const frame = now => {
+          if (words.length) {
+            const said = reduceMotion ? words.length : Math.min(words.length, Math.floor((now - started) / 260) + 1);
+            const done = said >= words.length && now - started > words.length * 260 + 300;
+            live.innerHTML = words.slice(0, said).map((w, i) => (i === said - 1 && !done ? `<span class="new">${esc(w)}</span>` : esc(w))).join(' ');
+          }
+          const level = voice.level(now / 1000);
+          dot.style.setProperty('--lvl', level.toFixed(3));
+          raf = requestAnimationFrame(frame);
         };
+        raf = requestAnimationFrame(frame);
+        return () => cancelAnimationFrame(raf);
       },
     }),
 
-    // Working out what you said, as the app: the same waves, low and slowly swelling in the thinking colours, your words
-    // shimmering under them; the island's edge glows violet and rose, pulsing.
     siroThinking: (heard = '') => ({
-      key: 'siro-think' + (heard ? '-words' : ''), shape: heard ? [420, 70, 24] : [280, 40, 20],
-      cls: 'v-siro listening thinking' + (heard ? ' words' : ''),
-      html: `${faceHTML('thinking')}<div class="listen"><canvas class="waves" aria-hidden="true"></canvas>` +
-        (heard ? `<span class="heard-live">${esc(heard)}</span>` : '') + `</div><span class="siro-corner close" aria-hidden="true">${ICON.x}</span>`,
-      mount: (el, island) => {
-        island.el.classList.add('edge-think');
-        const stopWaves = mountWaves(el.querySelector('.waves'), 'resting');
-        return () => {
-          stopWaves();
-          island.el.classList.remove('edge-think');
-        };
-      },
+      key: 'siro-think' + (heard ? '-words' : ''), shape: [400, 92, 28], cls: 'v-as thinking',
+      html: `<span class="v-light" aria-hidden="true"></span>${orbHTML('thinking')}` +
+        `<div class="as-mid">${heard ? `<b class="as-heard">${esc(heard)}</b>` : ''}<small class="as-sub">Working it out…</small></div>` +
+        `<span class="as-btn" aria-hidden="true">${ICON.x}</span>`,
     }),
 
-    // The answer: what you asked, in quotes, and Glyde's reply as it says it (■ stops it); the edge glows gold.
+    // The answer: what you asked, in quotes, then Glyde's reply, its words lit as it says them (■ stops it).
     siroAnswer: (heard, reply) => {
-      const shape = reply.length > 90 ? [430, 100, 26] : reply.length > 42 ? [400, 80, 24] : [390, 62, 24];
+      const shape = reply.length > 64 ? [420, 108, 28] : [400, 92, 28];
+      const words = reply.split(' ').map((w, i) => `<span style="--i:${i}">${esc(w)}</span>`).join(' ');
       return {
-        key: 'siro-answer-' + reply, shape, cls: 'v-siro answer' + (reply.length > 90 ? ' longer' : ''),
-        html: `${faceHTML('speaking')}<div class="siro-ans"><span class="siro-heard">“${esc(heard)}”</span><b class="siro-reply">${esc(reply)}</b></div>` +
-          '<span class="siro-corner" aria-hidden="true"><i></i></span>',
-        mount: (el, island) => {
-          island.el.classList.add('edge-speak');
-          return () => island.el.classList.remove('edge-speak');
-        },
+        key: 'siro-answer-' + reply, shape, cls: 'v-as answer',
+        html: `<span class="v-light" aria-hidden="true"></span>${orbHTML('speaking')}` +
+          `<div class="as-ans"><span class="as-quote">“${esc(heard)}”</span><b class="as-reply">${words}</b></div>` +
+          `<span class="as-btn stop" aria-hidden="true"><i></i></span>`,
       };
     },
 
@@ -810,7 +821,90 @@
 
     timers: (items = TIMERS) => ({
       key: 'timers', shape: [420, 214, 32], cls: 'v-timers with-tabs',
-      html: tabsHTML(5) + `<div class="tm-list">${timerRows(items)}</div>`,
+      html: tabsHTML(6) + `<div class="tm-list">${timerRows(items)}</div>`,
+    }),
+
+    // ---- Live activities, as the app shows them now ----
+
+    call: (name = 'Maya', app = 'WhatsApp') => ({
+      key: 'call-' + name, shape: [400, 56, 28], cls: 'v-call',
+      html: `<span class="cl-av">${ICON.user}</span><span class="cl-text"><b>${esc(name)}</b><small>${esc(app)} · Incoming call</small></span>` +
+        `<span class="cl-btn no">${ICON.x}</span><span class="cl-btn yes">${ICON.phone}</span>`,
+    }),
+
+    meeting: (title = 'Design review', when = 'in 4 min') => ({
+      key: 'meeting-' + title, shape: [400, 52, 26], cls: 'v-meet',
+      html: `<span class="mt-ic">${ICON.calendar}</span><span class="cl-text"><b>${esc(title)}</b><small>${esc(when)}</small></span><span class="mt-join">Join</span>`,
+    }),
+
+    download: (file = 'Glyde-setup.msix', size = '21.6 MB', speed = '4.8 MB/s') => ({
+      key: 'download-' + file, shape: [360, 40, 20], cls: 'v-dl',
+      html: `<span class="dl-ic">${ICON.download}</span><b class="dl-name">${esc(file)}</b><span class="dl-meta">${esc(size)} · ${esc(speed)}</span><span class="dl-line"><i></i></span>`,
+    }),
+
+    copying: (pct = 42) => ({
+      key: 'copying', shape: [340, 40, 20], cls: 'v-copy',
+      html: `<span class="cp-ic">${ICON.copy}</span><span class="cp-name"><b>Copying files</b><span class="cp-line"><i style="width:${pct}%"></i></span></span><b class="cp-pct">${pct}%</b>`,
+    }),
+
+    score: () => ({
+      key: 'score', shape: [400, 40, 20], cls: 'v-score',
+      html: `<span class="sc-team"><small>IND</small><b>245/4</b></span><span class="sc-mid">India need 67 off 70 balls</span><span class="sc-team r"><b>311/7</b><small>AUS</small></span>`,
+    }),
+
+    focusLive: (left = '8:40', done = .35) => ({
+      key: 'focus-live', shape: [300, 40, 20], cls: 'v-focus-live',
+      html: `<svg class="fl-ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" class="bg"/><circle cx="12" cy="12" r="9.5" class="fg" pathLength="100" style="stroke-dasharray:${(done * 100).toFixed(0)} 100"/></svg>` +
+        `<b>Focus</b><b class="fl-left">${esc(left)}</b>`,
+    }),
+
+    prompterLive: () => ({
+      key: 'prompter-live', shape: [560, 132, 30], cls: 'v-prompt-live',
+      html: `<span class="pl-cam" aria-hidden="true"><i class="pl-head"></i><i class="pl-body"></i></span>` +
+        `<div class="pl-script"><p>Good morning, everyone, and thanks for joining. Today I want to walk you through what we shipped this month, and what comes next for the island.</p></div>` +
+        `<div class="pl-ctl"><span class="pl-pause">${ICON.pause}</span><span class="pl-speed">−<b>1×</b>+</span><span class="pl-stop">Stop</span></div>`,
+    }),
+
+    notes: () => ({
+      key: 'notes', shape: [420, 200, 32], cls: 'v-notes with-tabs',
+      html: tabsHTML(5) + `<div class="nn-list">` +
+        `<div class="nn-row"><b>Buy milk and coffee</b><small>Today</small></div>` +
+        `<div class="nn-row"><b>Launch checklist: screenshots, store text, pricing</b><small>Yesterday · from Chrome</small></div>` +
+        `<div class="nn-row"><b>Export at 1600 px, quality 80%</b><small>Monday · from Point &amp; Ask</small></div></div>`,
+    }),
+
+    // ---- Coding agents on the island (Glyde Pro) ----
+
+    agentWorking: (project = 'website', doing = 'Editing pricing.css') => ({
+      key: 'agent-working', shape: [380, 40, 20], cls: 'v-agent-w',
+      html: `<span class="ag-tile">${ICON.terminal}</span><b class="ag-proj">${esc(project)}</b><span class="ag-doing">${esc(doing)}</span><span class="ag-spin" aria-hidden="true"></span>`,
+    }),
+
+    agentNeedsYou: (project = 'glyde', ask = 'git push origin main') => ({
+      key: 'agent-needs', shape: [420, 56, 28], cls: 'v-agent-n',
+      html: `<span class="ag-tile">${ICON.terminal}</span><span class="cl-text"><b>Agent needs you <span class="ag-dim">· ${esc(project)}</span></b><small>Wants to run: ${esc(ask)}</small></span>` +
+        `<span class="ag-warn">${ICON.warn}</span>`,
+    }),
+
+    agentDanger: (project = 'website', ask = 'rm -rf ./build', why = 'This deletes the build folder and can’t be undone.') => ({
+      key: 'agent-danger', shape: [440, 116, 30], cls: 'v-agent-d',
+      html: `<span class="v-light" aria-hidden="true"></span><span class="ag-tile red">${ICON.shield}</span>` +
+        `<span class="ag-d-text"><b>Held until you allow it <span class="ag-dim">· ${esc(project)}</span></b><code>${esc(ask)}</code><small>${esc(why)}</small></span>` +
+        `<span class="ag-d-btns"><span class="ag-btn deny">Deny</span><span class="ag-btn allow">Allow</span></span>`,
+    }),
+
+    agentDone: (project = 'website', what = 'Fixed the pricing page on phones') => ({
+      key: 'agent-done', shape: [400, 56, 28], cls: 'v-agent-ok',
+      html: `<span class="ag-tile green">${ICON.check}</span><span class="cl-text"><b>Done <span class="ag-dim">· ${esc(project)}</span></b><small>${esc(what)}</small></span>`,
+    }),
+
+    agents: () => ({
+      key: 'agents', shape: [440, 262, 32], cls: 'v-agents with-tabs',
+      html: tabsHTML(1) + `<div class="ag-head"><span>1 working · 1 waiting for you · 1 done</span><span class="ag-clear">Clear finished</span></div>` +
+        `<div class="ag-row"><span class="ag-tile">${ICON.terminal}</span><span class="ag-r-text"><b>glyde <span class="ag-dim">Ship the notifications tab</span></b><small class="amber">Wants to run: git push origin main</small>` +
+        `<span class="ag-r-btns"><span class="ag-btn allow-g">Allow</span><span class="ag-btn deny">Deny</span></span></span><small class="ag-when">now</small></div>` +
+        `<div class="ag-row"><span class="ag-tile">${ICON.terminal}</span><span class="ag-r-text"><b>website <span class="ag-dim">Fix the pricing page on phones</span></b><small>Editing pricing.css</small></span><small class="ag-when">now</small></div>` +
+        `<div class="ag-row"><span class="ag-tile">${ICON.terminal}</span><span class="ag-r-text"><b>api <span class="ag-dim">Add rate limits</span></b><small class="green">Done: limits on every public route, with tests</small></span><small class="ag-when">2m</small></div>`,
     }),
   };
 
@@ -929,5 +1023,5 @@
     }
   }
 
-  window.WI = { Island, Director, V, ICON, TRACKS, CLIPBOARD, SHELF, player, voice, colorsFor, artHTML, batteryIcon, faceHTML, reduceMotion, sleep, esc };
+  window.WI = { Island, Director, V, ICON, TRACKS, CLIPBOARD, SHELF, player, voice, colorsFor, artHTML, batteryIcon, faceHTML, orbHTML, reduceMotion, sleep, esc };
 })();

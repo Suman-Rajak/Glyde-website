@@ -101,7 +101,7 @@
 
   const moreGrid = $('#more-grid');
   const moreToggle = $('.more-toggle');
-  const moreCount = moreGrid.children.length;
+  const moreCount = moreGrid ? moreGrid.children.length : 0;
   if (moreCount > 6) {
     moreToggle.hidden = false;
     moreToggle.textContent = `Show all ${moreCount}`;
@@ -178,12 +178,14 @@
 
   // Hovering an island with music opens it, with tabs for the clipboard and file shelf.
   function expandedView(tab) {
-    // (the app's tabs, in its order: what's playing or the clock, Focus, Prompter, Clipboard, Shelf, Timers)
-    if (tab === 1) return V.focus();
-    if (tab === 2) return V.prompter();
+    // (the app's tabs, in its order: what's playing, Agents, Notifications, Clipboard, Shelf, Notes, Focus, Prompter)
+    if (tab === 1) return V.agents();
+    if (tab === 2) return V.notificationExpanded(MESSAGES[0]);
     if (tab === 3) return V.clipboard();
     if (tab === 4) return V.shelf();
-    if (tab === 5) return V.timers();
+    if (tab === 5) return V.notes();
+    if (tab === 6) return V.focus();
+    if (tab === 7) return V.prompter();
     return V.mediaExpanded(true);
   }
 
@@ -217,15 +219,15 @@
 
   const SECTIONS = [
     { id: 'top', label: 'Glyde' },
-    { id: 'why', label: 'Why Glyde', menu: false },
-    { id: 'how', label: 'How it works', sub: 'Lives at the top', icon: 'sparkle' },
     { id: 'features', label: 'Features', sub: 'Live activities', icon: 'grid' },
     { id: 'music', label: 'Music', sub: 'Colour that listens', icon: 'note' },
-    { id: 'say-it', label: 'Just say it', menu: false },
     { id: 'voice', label: 'Hey Glyde', sub: 'Voice assistant', icon: 'mic' },
+    { id: 'point', label: 'Point & Ask', sub: 'Ask about your screen', icon: 'cursor' },
+    { id: 'browser', label: 'Browser control', sub: 'Coming soon', icon: 'globe' },
     { id: 'privacy', label: 'Privacy', sub: 'Private by design', icon: 'shield' },
     { id: 'pricing', label: 'Pricing', sub: 'Free and Pro', icon: 'tag' },
-    { id: 'faq', label: 'FAQ', sub: 'Good questions', icon: 'question' },
+    { id: 'faq', label: 'FAQ', sub: 'Questions, answered', icon: 'question' },
+    { id: 'changelog', label: 'Changelog', sub: 'What’s new', icon: 'sparkle', href: 'changelog.html' },
     { id: 'founder', label: 'Founder’s note', menu: false },
     { id: 'get', label: 'Get Glyde', sub: LAUNCHED ? 'Download it free' : 'Join the waitlist', icon: 'download', cta: true },
   ];
@@ -256,10 +258,11 @@
 
   function navMenu() {
     const links = SECTIONS.slice(1).filter(s => s.menu !== false).map(s =>
-      `<a href="#${s.id}" class="${s.cta ? 'cta' : ''}${s.id === currentSection.id ? ' here" aria-current="location' : ''}">` +
+      `<a href="${s.href || '#' + s.id}" class="${s.cta ? 'cta' : ''}${s.id === currentSection.id ? ' here" aria-current="location' : ''}">` +
       `<span class="m-ic">${ICON[s.icon]}</span><span><b>${s.label}</b><small>${s.sub}</small></span></a>`
     ).join('');
-    return { key: 'nav-menu', shape: [420, 202, 30], cls: 'v-menu', html: links };
+    const rows = Math.ceil(SECTIONS.slice(1).filter(s => s.menu !== false).length / 2);
+    return { key: 'nav-menu', shape: [420, 26 + rows * 44, 30], cls: 'v-menu', html: links };
   }
 
   // The menu island acts the page out too: now playing in Music, Glyde listening in the voice section.
@@ -310,7 +313,7 @@
       if (!entry.isIntersecting) return;
       const id = entry.target.id;
       currentSection = SECTIONS.find(s => s.id === id) || SECTIONS[0];
-      topbar.classList.toggle('on-night', id === 'voice' || id === 'privacy');
+      topbar.classList.toggle('on-night', id === 'voice' || id === 'privacy' || id === 'point' || id === 'browser' || id === 'top');
       navIsland.setNeutral(id !== 'music');
       nav.refresh();
     });
@@ -392,6 +395,7 @@
 
   // ---- Story: how it lives -------------------------------------------------------------------
 
+  if ($('#story-screen')) {
   const storyScreen = $('#story-screen');
   const storyIsland = new Island($('#story-island'), { music: true });
   let storyStep = 0;
@@ -426,13 +430,16 @@
     entries.forEach(entry => { if (entry.isIntersecting) setStoryStep(Number(entry.target.dataset.step)); });
   }, { rootMargin: '-48% 0px -48% 0px' });
   $$('.story-steps li').forEach(li => stepObserver.observe(li));
+  }
 
   // ---- Feature cards ---------------------------------------------------------------------------
+  // (only if the old cards are on the page; the feature explorer, features.js, has taken their place)
+  if ($('.bento')) {
 
   const card = name => $(`[data-card="${name}"]`);
 
   // Now playing: the full player, always open.
-  new Director(new Island(card('music'), { music: true }), { base: () => V.mediaExpanded(false) });
+  if (card('music')) new Director(new Island(card('music'), { music: true }), { base: () => V.mediaExpanded(false) });
 
   // Notifications: hover the banner to read it all.
   let messageIndex = 0;
@@ -600,6 +607,7 @@
       addEventListener('pointercancel', up);
     });
   });
+  }
 
   // ---- Music colours ----------------------------------------------------------------------------
 
@@ -692,9 +700,8 @@
       icon: 'chat', title: 'WhatsApp to Mom',
       body: 'Hi Mom, I’ll be a little late tonight. Don’t wait for me for dinner 🙂', open: 'Open WhatsApp',
     }, 'Opened WhatsApp. You press Send.'),
-    translate: answered('Translate this to Hindi', 'Translated to Hindi. It’s copied.'),
+    translate: answered('Translate this to French', 'Translated to French. It’s copied.'),
     question: answered('What’s the capital of Peru?', 'The capital of Peru is Lima.'),
-    hindi: answered('ताजमहल किसने बनवाया?', 'शाहजहाँ ने, अपनी पत्नी मुमताज़ महल की याद में।'),
   };
   const askButton = name => $(`.say[data-ask="${name}"]`);
   const askScript = name => async ctx => {
@@ -775,7 +782,7 @@
       });
     } catch (err) {
       voiceLabel.textContent = 'The microphone isn’t available here';
-      setTimeout(() => { voiceLabel.textContent = 'Try the waves with your voice'; }, 2600);
+      setTimeout(() => { voiceLabel.textContent = 'Try it with your voice'; }, 2600);
     }
   }
 
@@ -787,13 +794,13 @@
     mic = null;
     voice.source = null;
     voiceButton.setAttribute('aria-pressed', 'false');
-    voiceLabel.textContent = 'Try the waves with your voice';
+    voiceLabel.textContent = 'Try it with your voice';
     if (answer) {
       hold(siro, 6000);
       siro.run(async ({ show, wait }) => {
         show(V.siroThinking());
         if (!await wait(500)) return;
-        show(V.siroAnswer('…', 'Those waves were you. In the app, I’d act on it.'));
+        show(V.siroAnswer('…', 'That was you. In the app, I’d act on it.'));
         await wait(3400);
       });
     }
@@ -824,7 +831,7 @@
 
   function setCurrency(currency, animate = true) {
     $$('.currency button').forEach(b => b.setAttribute('aria-checked', String(b.dataset.cur === currency)));
-    $$('.price b').forEach(price => {
+    $$('.price b, .price-pro[data-usd]').forEach(price => {
       const value = price.dataset[currency];
       if (!animate) { price.textContent = value; return; }
       price.classList.add('swap');
@@ -931,6 +938,8 @@
   // out the phrase lit last: the music, the message, the dying earbuds, the timer.
 
   const storyLine = $('.manifesto');
+  let updateStoryLine = () => {};
+  if (storyLine) {
   const storyLinePin = $('.manifesto-pin');
   const lineIsland = new Island($('#story-line-island'), { music: true });
   const words = [];
@@ -967,7 +976,7 @@
   lineIsland.setNeutral(true);
   lineIsland.show(V.idle());
 
-  function updateStoryLine() {
+  updateStoryLine = function () {
     const box = storyLine.getBoundingClientRect();
     if (box.bottom < -200 || box.top > innerHeight + 200) return;
     const progress = reduceMotion ? 1 : Math.min(1, Math.max(0, -box.top / (box.height - innerHeight)));
@@ -982,6 +991,7 @@
     lineIsland.setNeutral(cue !== 'music');
     lineIsland.show((CUE_VIEWS[cue] || V.idle)());
     storyLinePin.classList.toggle('lit', cue === 'glyde' || cue === 'glance');
+  };
   }
 
   // ---- Just say it: phrases drifting both ways, faster while you scroll ----------------------
@@ -1056,7 +1066,7 @@
 
   function updateDock() {
     const nearEnd = scrollY + innerHeight > document.documentElement.scrollHeight - 160;
-    const pastStory = storyLine.getBoundingClientRect().bottom < innerHeight * 0.6;
+    const pastStory = storyLine ? storyLine.getBoundingClientRect().bottom < innerHeight * 0.6 : scrollY > innerHeight * 1.1;
     dock.classList.toggle('show', !dockClosed && !joined && !getInView && !nearEnd && pastStory);
   }
 

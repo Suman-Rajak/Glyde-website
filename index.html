@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Glyde: your desktop just got a halo</title>
+  <title>Glyde · The dynamic island for Windows</title>
   <meta name="description" content="Glyde is a voice island for Windows: a living island at the top of your screen for music and lyrics, messages, calls, timers, and your clipboard, with an assistant that answers to “Hey Glyde”.">
   <meta name="theme-color" content="#e9e2ff">
-  <meta property="og:title" content="Glyde: your desktop just got a halo">
+  <meta property="og:title" content="Glyde · The dynamic island for Windows">
   <meta property="og:description" content="A voice island for Windows: music and lyrics, messages, timers and your clipboard, and an assistant that answers to “Hey Glyde”. Coming soon for Windows 10 and 11.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="apple-touch-icon.png">
@@ -15,10 +15,16 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preload" href="fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="polish.css">
   <script>document.documentElement.classList.add('js');</script>
   <script defer src="config.js"></script>
   <script defer src="island.js"></script>
   <script defer src="main.js"></script>
+  <script defer src="dots.js"></script>
+  <script defer src="point.js"></script>
+  <script defer src="wordmark.js"></script>
+  <script defer src="features.js"></script>
+  <script defer src="browser.js"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -26,14 +32,27 @@
 
   <!-- The menu is an island too: it shows where you are, and opens into the sections on hover. -->
   <header class="topbar">
-    <a class="brand" href="#top" aria-label="Glyde home">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-name">Glyde</span>
-    </a>
+    <div class="tb-side">
+      <a class="brand" href="#top" aria-label="Glyde home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">Glyde</span>
+      </a>
+      <nav class="tb-links" aria-label="Main">
+        <a href="#features">Features</a>
+        <a href="#point">Point &amp; Ask</a>
+        <a href="#pricing">Pricing</a>
+      </nav>
+    </div>
     <nav class="nav-island" aria-label="Sections">
       <div id="nav-island" style="--h:250"></div>
     </nav>
-    <a class="btn btn-dark btn-sm" href="#get" data-cta><span class="long">Join the waitlist</span><span class="short">Join</span></a>
+    <div class="tb-side right">
+      <nav class="tb-links" aria-label="More">
+        <a href="#faq">FAQ</a>
+        <a href="changelog.html">Changelog</a>
+      </nav>
+      <a class="btn btn-dark btn-sm" href="#get" data-cta><span class="long">Join the waitlist</span><span class="short">Join</span></a>
+    </div>
   </header>
 
   <main id="main">
@@ -47,12 +66,8 @@
       </div>
 
       <div class="hero-inner">
-        <a class="eyebrow reveal" href="#pricing"><span class="new-tag">Free</span>The island is free. Glyde Pro is one payment, after a 14-day trial<span class="eb-arrow" data-icon="arrow"></span></a>
-        <h1 class="hero-title">
-          <span class="line"><span>Your desktop</span></span>
-          <span class="line"><span>just got a <em class="halo-word">halo.</em></span></span>
-        </h1>
-        <p class="hero-sub reveal" style="--d:.35s">Glyde is a voice island for Windows. Music and lyrics, messages, calls, timers and your clipboard appear at the top of your screen the moment they matter, then melt away. And it answers to “Hey&nbsp;Glyde”.</p>
+        <h1 class="hero-title wordmark"><span class="wm-text">Glyde</span></h1>
+        <p class="hero-sub reveal" style="--d:.25s">The dynamic island for Windows.</p>
 
         <!-- Until launch, one thing to do (the waitlist); the Download and Store buttons appear once config.js has their links. -->
         <div class="get-row launch-only reveal" style="--d:.5s">
@@ -62,7 +77,6 @@
         <p class="get-note launch-only reveal" style="--d:.55s" data-get-note>Free for Windows 10 &amp; 11</p>
 
         <div class="prelaunch-only reveal" style="--d:.5s">
-          <p class="waitlist-label">Coming soon for Windows 10 and 11. Get one email the day it launches:</p>
           <form class="waitlist" data-waitlist data-source="hero" novalidate>
             <label class="sr-only" for="email-hero">Email address</label>
             <input id="email-hero" name="email" type="email" required placeholder="you@example.com" autocomplete="email">
@@ -108,184 +122,61 @@
       <a class="scroll-cue" href="#why"><span class="mouse" aria-hidden="true"></span>Scroll to watch it come alive</a>
     </section>
 
-    <!-- ============================== THE STORY, WORD BY WORD ============================== -->
-    <!-- Pinned while you scroll: the words light up one by one, and the island acts each phrase out. -->
-    <section class="manifesto" id="why" data-section="Why Glyde" aria-label="Why Glyde">
-      <div class="manifesto-pin">
-        <div id="story-line-island" class="halo-glow" style="--h:80" data-max="1.35" data-fit="400"></div>
-        <p class="manifesto-text" data-words>Your PC knows <span data-cue="music">what's playing,</span> <span data-cue="message">who just messaged,</span> <span data-cue="earbuds">when your earbuds are about to die</span> and <span data-cue="timer">how long is left on the timer.</span> <span data-cue="quiet">It just never tells you.</span> <em data-cue="glyde">Glyde does.</em> <span data-cue="glance">One glance at the top of your screen, then it gets out of your way.</span></p>
-      </div>
-    </section>
-
-    <!-- ============================== HOW IT LIVES ============================== -->
-    <section class="story" id="how" data-section="How it works">
-      <div class="section-head reveal">
-        <p class="kicker">How it lives</p>
-        <h2>Right where your eyes <span class="soft">already are.</span></h2>
-      </div>
-      <div class="story-grid">
-        <div class="story-stick">
-          <div class="screen small" id="story-screen" data-step="0">
-            <div class="display">
-              <div class="wallpaper alt" aria-hidden="true">
-                <div class="wp-sun"></div>
-                <div class="wp-cloud a"></div><div class="wp-cloud c"></div>
-              </div>
-              <div class="movie" aria-hidden="true"><div class="movie-scene"></div><div class="movie-bar"><i></i></div></div>
-              <div class="island-slot"><div id="story-island" style="--h:220" data-max="1.1"></div></div>
-              <span class="fake-cursor" aria-hidden="true"></span>
-              <div class="taskbar" aria-hidden="true">
-                <div class="tb-apps"><i class="tb-start"></i><i class="tb-search"></i><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
-              </div>
-            </div>
-          </div>
-          <div class="story-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
-        </div>
-        <ol class="story-steps">
-          <li data-step="0">
-            <span class="step-n">01</span>
-            <h3>Quiet when nothing's happening.</h3>
-            <p>A small dark pill at the top of the screen. Or nothing at all: turn on “Hide when idle” and it fades away until you point at the top of the screen.</p>
-          </li>
-          <li data-step="1">
-            <span class="step-n">02</span>
-            <h3>Alive the moment something is.</h3>
-            <p>A song starts, your earbuds connect, the charger goes in. The island springs into a live activity, tells you what you need, then settles back.</p>
-          </li>
-          <li data-step="2">
-            <span class="step-n">03</span>
-            <h3>Hover, and it opens.</h3>
-            <p>Point at the island for artwork, lyrics and controls, with tabs for notifications, your clipboard, the file shelf, timers and more. Scroll over it to flip between them. Clicking it never steals focus from what you're doing.</p>
-          </li>
-          <li data-step="3">
-            <span class="step-n">04</span>
-            <h3>Gone when you go fullscreen.</h3>
-            <p>Games and films get the whole screen. The island steps aside and comes back when you do. Everywhere else, clicks pass straight through around it.</p>
-          </li>
-        </ol>
-      </div>
-    </section>
-
     <!-- ============================== FEATURES ============================== -->
     <section class="features" id="features" data-section="Features">
       <div class="section-head center reveal">
-        <p class="kicker">Live activities</p>
-        <h2>Everything happening. <span class="soft">One glance.</span></h2>
-        <p class="lede">Every one of these is something the app really shows. Go on, poke them.</p>
-      </div>
+        <h2>Everything, <span class="soft">at a glance.</span></h2>
+              </div>
 
-      <div class="bento">
-        <article class="card span-7 reveal">
-          <div class="card-screen tall"><div data-card="music" style="--h:180" data-max="1"></div></div>
-          <div class="card-copy">
-            <h3>Now playing, from anywhere</h3>
-            <p>Spotify, YouTube in Chrome or Edge, Amazon Music, Media Player and any app that shares what it's playing. Artwork, progress, controls and synced lyrics, right at the top.</p>
+      <!-- Every feature, one at a time on one screen: pick a group, then a feature (or let it play through them). -->
+      <div class="fx reveal">
+        <div class="fx-groups" role="tablist" aria-label="Feature groups">
+          <button role="tab" id="fx-tab-live" aria-controls="fx-list-live" aria-selected="true" tabindex="0" data-group="live">Live</button>
+          <button role="tab" id="fx-tab-work" aria-controls="fx-list-work" aria-selected="false" tabindex="-1" data-group="work">Work</button>
+          <button role="tab" id="fx-tab-agents" aria-controls="fx-list-agents" aria-selected="false" tabindex="-1" data-group="agents">Coding agents</button>
+        </div>
+        <div class="fx-body">
+          <div class="fx-lists">
+          <ul class="fx-list" id="fx-list-live" role="tabpanel" aria-labelledby="fx-tab-live" data-group="live">
+            <li><button type="button" data-fx="music" aria-pressed="false"><b>Now playing</b><span>Any music app, with synced lyrics, in the cover’s colours.</span></button></li>
+            <li><button type="button" data-fx="call" aria-pressed="false"><b>Calls <span class="fx-pro">Pro</span></b><span>Phone Link, WhatsApp and Teams calls ring on the island.</span></button></li>
+            <li><button type="button" data-fx="notification" aria-pressed="false"><b>Notifications <span class="fx-pro">Pro</span></b><span>A short banner, then a tab with each conversation.</span></button></li>
+            <li><button type="button" data-fx="meeting" aria-pressed="false"><b>Meetings <span class="fx-pro">Pro</span></b><span>A countdown to your next meeting, with Join.</span></button></li>
+            <li><button type="button" data-fx="download" aria-pressed="false"><b>Downloads and copies</b><span>How far a download or a file copy has got.</span></button></li>
+            <li><button type="button" data-fx="level" aria-pressed="false"><b>Volume and brightness</b><span>A level bar, painted in your music’s colours.</span></button></li>
+            <li><button type="button" data-fx="battery" aria-pressed="false"><b>Battery and earbuds</b><span>Charging, full and low, and your earbuds’ charge.</span></button></li>
+            <li><button type="button" data-fx="privacy" aria-pressed="false"><b>Microphone and camera</b><span>A dot whenever an app uses them, with its name.</span></button></li>
+            <li><button type="button" data-fx="score" aria-pressed="false"><b>Live scores</b><span>Cricket and football, ball by ball.</span></button></li>
+            <li><button type="button" data-fx="timer" aria-pressed="false"><b>Timers and alarms <span class="fx-pro">Pro</span></b><span>Counting down in the pill, ringing with Snooze.</span></button></li>
+          </ul>
+          <ul class="fx-list" id="fx-list-work" role="tabpanel" aria-labelledby="fx-tab-work" data-group="work" hidden>
+            <li><button type="button" data-fx="clipboard" aria-pressed="false"><b>Clipboard history <span class="fx-pro">Pro</span></b><span>Your last copies: text, links, images and files.</span></button></li>
+            <li><button type="button" data-fx="shelf" aria-pressed="false"><b>File shelf <span class="fx-pro">Pro</span></b><span>Park files on the island, drag them out anywhere.</span></button></li>
+            <li><button type="button" data-fx="notes" aria-pressed="false"><b>Notes <span class="fx-pro">Pro</span></b><span>“Note: buy milk”, or save what you’ve selected.</span></button></li>
+            <li><button type="button" data-fx="focus" aria-pressed="false"><b>Focus timer <span class="fx-pro">Pro</span></b><span>Rounds of focus and breaks, in the pill.</span></button></li>
+            <li><button type="button" data-fx="prompter" aria-pressed="false"><b>Teleprompter and mirror <span class="fx-pro">Pro</span></b><span>Your script scrolls just under the webcam.</span></button></li>
+            <li><button type="button" data-fx="menubar" aria-pressed="false"><b>Menu bar <span class="fx-pro">Pro</span></b><span>Menus, Wi-Fi, sound, battery and the date, beside the notch.</span></button></li>
+            <li><button type="button" data-fx="search" aria-pressed="false"><b>Search <span class="fx-pro">Pro</span></b><span>Apps, files and sums from a shortcut.</span></button></li>
+          </ul>
+          <ul class="fx-list" id="fx-list-agents" role="tabpanel" aria-labelledby="fx-tab-agents" data-group="agents" hidden>
+            <li><button type="button" data-fx="agentWorking" aria-pressed="false"><b>See them work <span class="fx-pro">Pro</span></b><span>Each agent’s session on the island: what it’s doing right now.</span></button></li>
+            <li><button type="button" data-fx="agentNeedsYou" aria-pressed="false"><b>A ping when one needs you <span class="fx-pro">Pro</span></b><span>Allow or Deny its request from the island.</span></button></li>
+            <li><button type="button" data-fx="agentDanger" aria-pressed="false"><b>Risky moves held <span class="fx-pro">Pro</span></b><span>Wiping a database or deleting a folder waits. Only the island can allow it.</span></button></li>
+            <li><button type="button" data-fx="agentDone" aria-pressed="false"><b>Done, at a glance <span class="fx-pro">Pro</span></b><span>It tells you when the work is finished.</span></button></li>
+            <li><button type="button" data-fx="agents" aria-pressed="false"><b>All of them in one tab <span class="fx-pro">Pro</span></b><span>Working, waiting for you and done, side by side.</span></button></li>
+          </ul>
           </div>
-        </article>
-
-        <article class="card span-5 reveal" style="--d:.08s">
-          <div class="card-screen tall sky-2"><div data-card="notification" style="--h:200" data-max="1"></div></div>
-          <div class="card-copy">
-            <h3>Notifications that don't shout</h3>
-            <p>A two-line banner for a few seconds, and a tab with each conversation's messages: click one to open its app. Calls ring on the island too. Quiet while Do Not Disturb is on.</p>
-          </div>
-        </article>
-
-        <article class="card span-4 reveal">
-          <div class="card-screen sky-3"><div data-card="level" style="--h:60" data-max="1" data-fit="320"></div></div>
-          <div class="card-copy">
-            <h3>Volume &amp; brightness</h3>
-            <p>Changes glide in as a level bar, painted in your music's colours.</p>
-          </div>
-        </article>
-
-        <article class="card span-4 reveal" style="--d:.08s">
-          <div class="card-screen sky-4"><div data-card="battery" style="--h:60" data-max="1" data-fit="320"></div></div>
-          <div class="card-copy">
-            <h3>Charging, full, and low</h3>
-            <p>Plug in, hit 100%, or drop to 20% and 10%. Each one said once, never nagging.</p>
-          </div>
-        </article>
-
-        <article class="card span-4 reveal" style="--d:.16s">
-          <div class="card-screen sky-5"><div data-card="bluetooth" style="--h:60" data-max="1" data-fit="320"></div></div>
-          <div class="card-copy">
-            <h3>Your earbuds, and their battery</h3>
-            <p>Headphones, speakers and phones connecting, with their charge. Short drops are ignored.</p>
-          </div>
-        </article>
-
-        <article class="card span-6 reveal">
-          <div class="card-screen tall sky-6"><div data-card="clipboard" style="--h:236" data-max="1"></div></div>
-          <div class="card-copy">
-            <h3>Clipboard history</h3>
-            <p>Your last 20 copies: text, links, images and files. Click one to copy it again, search them, and bookmark the ones to keep. Anything a password manager marks private is skipped.</p>
-          </div>
-        </article>
-
-        <article class="card span-6 reveal" style="--d:.08s">
-          <div class="card-screen tall sky-7 shelf-demo">
-            <div data-card="shelf" style="--h:226" data-max="1"></div>
-            <div class="drag-files" aria-label="Files you can drag onto the island">
-              <button class="drag-file" data-kind="file" data-name="Proposal.pdf"><span data-icon="file"></span>Proposal.pdf</button>
-              <button class="drag-file" data-kind="image" data-name="Sunrise.png"><span data-icon="image"></span>Sunrise.png</button>
-              <button class="drag-file" data-kind="folder" data-name="Photos"><span data-icon="folder"></span>Photos</button>
+          <div class="fx-stage">
+            <div class="screen fx-device">
+              <div class="display fx-screen">
+                <div class="fx-menubar" aria-hidden="true"><b>Glyde</b><span>File</span><span>Edit</span><span>View</span><span>Window</span><i class="fx-mb-right"><span>Wi-Fi</span><span>100%</span><span>Mon 16 Nov  12:40</span></i></div>
+                <div class="fx-search" aria-hidden="true"><div class="fx-search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span>budget</span></div><div class="fx-search-row on"><i></i><span><b>Trip budget.xlsx</b><small>Documents</small></span></div><div class="fx-search-row"><i class="app"></i><span><b>Calculator</b><small>App</small></span></div><div class="fx-search-row"><i class="sum"></i><span><b>2,400 + 3,600 = 6,000</b><small>Sum</small></span></div></div>
+                <div class="island-slot"><div id="fx-island" style="--h:270" data-max="1.1" data-fit="470"></div></div>
+              </div>
             </div>
-            <p class="drag-hint">Drag a file onto the island <span aria-hidden="true">↑</span></p>
+            <p class="fx-caption" aria-live="polite"></p>
           </div>
-          <div class="card-copy">
-            <h3>A shelf for files</h3>
-            <p>Drop files on the island to park them. Drag them out later into any folder, email or chat. Always a copy; the originals never move.</p>
-          </div>
-        </article>
-
-        <article class="card span-4 reveal">
-          <div class="card-screen sky-10"><div data-card="timers" style="--h:66" data-max="1" data-fit="400"></div></div>
-          <div class="card-copy">
-            <h3>Timers, alarms &amp; reminders</h3>
-            <p>“Timer 10 minutes”, “wake me up at 6:30”, “remind me at 5 to call Mom”. It counts down in the pill and rings with Snooze and Stop.</p>
-          </div>
-        </article>
-
-        <article class="card span-4 reveal" style="--d:.08s">
-          <div class="card-screen sky-8"><div data-card="privacy" style="--h:60" data-max="1" data-fit="320"></div></div>
-          <div class="card-copy">
-            <h3>Know who's listening</h3>
-            <p>An orange dot for the microphone, green for the camera, red while an app records your screen, and the name of the app, read from the same place as Windows' own indicator.</p>
-          </div>
-        </article>
-
-        <article class="card span-4 reveal" style="--d:.16s">
-          <div class="card-screen sky-9 fs-demo" data-full="0">
-            <div class="fs-movie" aria-hidden="true"><div class="movie-scene"></div></div>
-            <div data-card="fullscreen" style="--h:60" data-max="1" data-fit="320"></div>
-            <span class="fs-label" aria-hidden="true"></span>
-          </div>
-          <div class="card-copy">
-            <h3>Never in the way</h3>
-            <p>Hides for fullscreen games and films, YouTube in your browser included, lets clicks pass through around it, and never steals focus.</p>
-          </div>
-        </article>
-      </div>
-
-      <div class="more" id="more">
-        <h3 class="more-title reveal">And there's <span class="soft">more.</span></h3>
-        <ul class="more-grid" id="more-grid">
-          <li class="reveal"><span class="more-ic" data-icon="text"></span><b>Synced lyrics</b><p>The line being sung lights up as it plays. Click a line to jump there.</p></li>
-          <li class="reveal" style="--d:.05s"><span class="more-ic" data-icon="phone"></span><b>Incoming calls</b><p>Phone Link, WhatsApp and Teams calls ring on the island, with a button to answer in the app.</p></li>
-          <li class="reveal" style="--d:.1s"><span class="more-ic" data-icon="calendar"></span><b>Meeting countdown</b><p>Ten minutes before a meeting in your Windows calendar, with Join for Teams, Zoom, Meet and Webex.</p></li>
-          <li class="reveal"><span class="more-ic" data-icon="image"></span><b>Screenshots</b><p>A new one drops into the island: drag it out, copy it, or copy the text in it.</p></li>
-          <li class="reveal" style="--d:.05s"><span class="more-ic" data-icon="download"></span><b>Downloads and copies</b><p>How far a download or a file copy has got, then Open and Show in folder.</p></li>
-          <li class="reveal" style="--d:.1s"><span class="more-ic" data-icon="trophy"></span><b>Live scores</b><p>Cricket and football, with goals and wickets lit up as they happen.</p></li>
-          <li class="reveal"><span class="more-ic" data-icon="clock"></span><b>The clock</b><p>Open it with nothing playing: the time big, the weather, your next meeting and timer.</p></li>
-          <li class="reveal" style="--d:.05s"><span class="more-ic" data-icon="stopwatch"></span><b>Focus timer</b><p>Rounds of focus and breaks, with a dial in a tab of its own.</p></li>
-          <li class="reveal" style="--d:.1s"><span class="more-ic" data-icon="camera"></span><b>Teleprompter and mirror</b><p>Your script scrolling just under the webcam, and a quick look at yourself before a call.</p></li>
-          <li class="reveal"><span class="more-ic" data-icon="menu"></span><b>A Mac-style menu bar</b><p>Menus, Control Center, Wi-Fi, sound, battery and the calendar, beside the notch.</p></li>
-          <li class="reveal" style="--d:.05s"><span class="more-ic" data-icon="search"></span><b>Search</b><p>Apps, files and sums from a shortcut, like Spotlight.</p></li>
-          <li class="reveal" style="--d:.1s"><span class="more-ic" data-icon="split"></span><b>PC actions</b><p>Two apps side by side in split screen, a song on YouTube, or any page of Settings, just by asking.</p></li>
-          <li class="reveal"><span class="more-ic" data-icon="code"></span><b>Coding agents</b><p>Claude Code and Codex on the island: Allow or Deny from it, a ping when one needs you, and risky moves stopped until you say so.</p></li>
-        </ul>
-        <p class="more-row"><button class="more-toggle" type="button" aria-expanded="false" aria-controls="more-grid" hidden>Show all</button></p>
+        </div>
       </div>
     </section>
 
@@ -294,9 +185,8 @@
       <div class="music-glow" aria-hidden="true"></div>
       <div class="music-grid">
         <div class="music-copy reveal">
-          <p class="kicker">Colour that listens</p>
-          <h2>It wears <span class="soft">your music.</span></h2>
-          <p class="lede">The glass, the level bars and the progress bar take their colours from the artwork. No artwork? Glyde looks it up, or paints a colour from the song itself.</p>
+          <h2>Your music, <span class="soft">in its colours.</span></h2>
+          <p class="lede">Spotify, YouTube in Chrome or Edge, Amazon Music, Media Player and more, with synced lyrics. The level meter, the progress ring and the light along the bottom take their colours from the artwork. No artwork? Glyde looks it up, or paints a colour from the song itself.</p>
           <div class="albums" role="radiogroup" aria-label="Pick a song"></div>
           <label class="switch">
             <input type="checkbox" id="match-colors" checked>
@@ -311,40 +201,6 @@
       </div>
     </section>
 
-    <!-- ============================== JUST SAY IT ============================== -->
-    <section class="say-it" id="say-it" data-section="Just say it" aria-labelledby="say-it-title">
-      <div class="section-head center reveal">
-        <p class="kicker">Just say it</p>
-        <h2 id="say-it-title">Talk to your PC <span class="soft">like a person.</span></h2>
-      </div>
-      <div class="marquee" data-speed="38" aria-hidden="true">
-        <div class="marquee-track">
-          <span class="phrase"><i class="dot"></i>Hey&nbsp;Glyde, pause the music</span>
-          <span class="phrase"><i class="dot"></i>Wake me up at 6:30</span>
-          <span class="phrase"><i class="dot"></i>Previous song</span>
-          <span class="phrase"><i class="dot"></i>Make the screen dimmer</span>
-          <span class="phrase"><i class="dot"></i>Open Claude and Brave in split screen</span>
-          <span class="phrase"><i class="dot"></i>Mute</span>
-          <span class="phrase"><i class="dot"></i>Play Believer on YouTube</span>
-          <span class="phrase"><i class="dot"></i>Open Bluetooth settings</span>
-          <span class="phrase"><i class="dot"></i>Find my resume</span>
-          <span class="phrase"><i class="dot"></i>Lock my PC</span>
-        </div>
-      </div>
-      <div class="marquee light" data-speed="-30" aria-hidden="true">
-        <div class="marquee-track">
-          <span class="phrase" lang="hi"><span class="ph-ic" data-icon="translate"></span>इसे अंग्रेज़ी में ट्रांसलेट करो</span>
-          <span class="phrase"><span class="ph-ic" data-icon="clipboard"></span>Summarise this</span>
-          <span class="phrase"><span class="ph-ic" data-icon="globe"></span>What's the weather in Delhi this weekend?</span>
-          <span class="phrase"><span class="ph-ic" data-icon="image"></span>Who is Narendra Modi?</span>
-          <span class="phrase"><span class="ph-ic" data-icon="text"></span>Make this formal</span>
-          <span class="phrase"><span class="ph-ic" data-icon="question"></span>What's in the news today?</span>
-        </div>
-      </div>
-      <p class="say-it-note reveal">The top row runs on your PC, in English and Hindi. The bottom row comes with Glyde AI, with nothing to set up.</p>
-      <p class="motion-row reveal"><button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false">Pause animations</button></p>
-    </section>
-
     <!-- ============================== NIGHT: VOICE + PRIVACY ============================== -->
     <div class="night">
       <div class="stars" aria-hidden="true"></div>
@@ -352,7 +208,6 @@
 
       <section class="siro" id="voice" data-section="Hey Glyde">
         <div class="section-head center reveal">
-          <p class="kicker">Voice assistant</p>
           <h2>Just say <em class="siro-word">“Hey&nbsp;Glyde.”</em></h2>
           <p class="lede">Press <span class="keys" role="button" tabindex="0" aria-label="Press Ctrl Alt S to try Glyde"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>S</kbd></span> or just say it. Glyde listens, understands, and does it, right on your PC.</p>
         </div>
@@ -373,44 +228,222 @@
         </div>
 
         <div class="voice-try reveal">
-          <button class="voice-btn" id="voice-btn" aria-pressed="false"><span class="vb-dot"></span><span class="vb-label">Try the waves with your voice</span></button>
+          <button class="voice-btn" id="voice-btn" aria-pressed="false"><span class="vb-dot"></span><span class="vb-label">Try it with your voice</span></button>
           <p class="micro">Only loudness is measured, in your browser. Nothing is recorded or sent.</p>
         </div>
 
         <div class="facts">
-          <div class="fact reveal"><b>On-device</b><p>Your voice becomes text on your PC, with Whisper on your graphics card when there is one. Recordings never leave it.</p></div>
+          <div class="fact reveal"><b>On-device</b><p>Your voice becomes text on your PC, on your graphics card when there is one. Recordings never leave it.</p></div>
           <div class="fact reveal" style="--d:.08s"><b>~0.2 s</b><p>to check whether you said “Hey&nbsp;Glyde”. Only the first two seconds after a pause are checked.</p></div>
-          <div class="fact reveal" style="--d:.16s"><b>English &amp; हिंदी</b><p>It works out which one you're speaking. With Glyde AI, Hinglish works too.</p></div>
+          <div class="fact reveal" style="--d:.16s"><b>Instant</b><p>Timers, music and apps are handled the moment you finish speaking.</p></div>
           <div class="fact reveal" style="--d:.24s"><b>Over the music</b><p>“Hey&nbsp;Glyde, pause” works even with music playing loud: Windows' echo cancellation filters out the PC's own sound.</p></div>
         </div>
 
         <div class="brain" id="brain">
           <div class="brain-copy reveal">
-            <p class="kicker"><span class="new-tag">Soon</span>Glyde AI, coming soon</p>
-            <h3 class="brain-title">Ask anything. Write emails and WhatsApps. <span class="soft">Even in Hindi.</span></h3>
-            <p>When a request needs more than your PC, Glyde AI answers it: questions (with a picture when it helps), the news and the weather anywhere, and copied text translated or rewritten. It drafts emails and WhatsApps on the island and asks before opening anything. You always press Send.</p>
-            <ul class="brain-points">
-              <li><span data-icon="sparkle"></span>Coming soon, as a monthly add-on for Glyde Pro. Nothing to set up: no keys, no sign-up.</li>
-              <li><span data-icon="image"></span>Ask who someone is, and their picture comes in under the answer.</li>
-              <li><span data-icon="shield"></span>Copied text is only sent when you say “this” or “copied”.</li>
-            </ul>
+            <p class="kicker"><span class="new-tag">Glyde AI · coming soon</span></p>
+            <h3 class="brain-title">Ask anything. <span class="soft">It writes the reply.</span></h3>
+            <p>Answers, emails and messages, drafted on the island. You always press Send.</p>
           </div>
           <div class="brain-demo reveal" style="--d:.1s">
             <div class="brain-stage"><div id="brain-island" style="--h:150" data-max="1.2" data-fit="460"></div></div>
             <div class="brain-asks" role="group" aria-label="Things to ask Glyde AI">
               <button class="say" data-ask="email"><span class="say-ic" data-icon="mail"></span>“Mail Rahul that the meeting moved to 4”</button>
               <button class="say" data-ask="whatsapp"><span class="say-ic" data-icon="chat"></span>“WhatsApp Mom that I'll be late”</button>
-              <button class="say" data-ask="translate"><span class="say-ic" data-icon="translate"></span>“Translate this to Hindi”</button>
+              <button class="say" data-ask="translate"><span class="say-ic" data-icon="translate"></span>“Translate this to French”</button>
               <button class="say" data-ask="question"><span class="say-ic" data-icon="question"></span>“What's the capital of Peru?”</button>
-              <button class="say" data-ask="hindi" lang="hi"><span class="say-ic" data-icon="sparkle"></span>“ताजमहल किसने बनवाया?”</button>
             </div>
           </div>
         </div>
       </section>
 
+
+      <!-- ============================== POINT & ASK ============================== -->
+      <!-- Drawn, not recorded: the apps, Glyde's marks, its pointer, its notes and its board are all SVG and HTML,
+           in the app's own look (violet marks with a soft glow, label pills, numbered notes, a ruled board). -->
+      <section class="point" id="point" data-section="Point &amp; Ask" aria-labelledby="point-title">
+        <div class="section-head center reveal">
+          <p class="kicker"><span class="new-tag">Glyde AI · coming soon</span></p>
+          <h2 id="point-title">Stuck? <em>Show it.</em></h2>
+          <p class="lede">Press <kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>Q</kbd> and ask about anything on your screen. Glyde draws on it, circles, arrows and labels, and talks you through it, with notes beside it or the working written out on a board.</p>
+        </div>
+
+        <div class="pa-tabs reveal" role="tablist" aria-label="Point &amp; Ask examples">
+          <button role="tab" id="pa-tab-photo" aria-controls="pa-stage" aria-selected="true" data-scene="photo">Photo editor</button>
+          <button role="tab" id="pa-tab-maths" aria-controls="pa-stage" aria-selected="false" tabindex="-1" data-scene="maths">Homework</button>
+          <button role="tab" id="pa-tab-sheet" aria-controls="pa-stage" aria-selected="false" tabindex="-1" data-scene="sheet">Spreadsheet</button>
+        </div>
+
+        <div class="pa reveal" id="pa-stage" role="tabpanel" aria-labelledby="pa-tab-photo">
+          <div class="screen pa-device">
+            <div class="display pa-screen" data-scene="photo">
+
+              <!-- the apps, in a 1000 x 600 space so the marks line up at any size -->
+              <svg class="pa-app" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="pa-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b1d5c"/><stop offset=".45" stop-color="#8b3b7a"/><stop offset=".75" stop-color="#ff8a5c"/><stop offset="1" stop-color="#ffd36e"/></linearGradient>
+                  <radialGradient id="pa-sun"><stop offset="0" stop-color="#fff6d0"/><stop offset=".6" stop-color="#ffc46e"/><stop offset="1" stop-color="#ffc46e" stop-opacity="0"/></radialGradient>
+                </defs>
+                <!-- a photo editor -->
+                <g data-for="photo">
+                  <rect width="1000" height="600" fill="#22212c"/>
+                  <rect width="1000" height="34" fill="#1a1922"/>
+                  <text x="500" y="22" text-anchor="middle" class="t-dim">Lumen · sunset.png</text>
+                  <rect y="34" width="1000" height="28" fill="#1f1e28"/>
+                  <text x="22" y="53" class="t-menu">File</text><text x="64" y="53" class="t-menu">Edit</text><text x="106" y="53" class="t-menu">Image</text><text x="158" y="53" class="t-menu">Layer</text><text x="210" y="53" class="t-menu">View</text>
+                  <rect y="62" width="56" height="538" fill="#1c1b25"/>
+                  <rect x="14" y="80" width="28" height="28" rx="7" fill="#5a52a8"/><rect x="14" y="120" width="28" height="28" rx="7" fill="#33314a"/><rect x="14" y="160" width="28" height="28" rx="7" fill="#33314a"/><rect x="14" y="200" width="28" height="28" rx="7" fill="#33314a"/><rect x="14" y="240" width="28" height="28" rx="7" fill="#33314a"/>
+                  <rect x="86" y="92" width="610" height="476" rx="4" fill="url(#pa-sky)"/>
+                  <circle cx="400" cy="380" r="70" fill="url(#pa-sun)"/>
+                  <path d="M86 470 C 220 400 330 430 420 470 S 600 420 696 450 V568 H86Z" fill="#2a1640"/>
+                  <path d="M86 520 C 250 470 400 500 520 530 S 640 500 696 510 V568 H86Z" fill="#1c0f2e"/>
+                  <rect x="726" y="62" width="274" height="538" fill="#1c1b25"/>
+                  <text x="750" y="98" class="t-cap">LAYERS</text>
+                  <rect x="744" y="110" width="238" height="30" rx="7" fill="#33314a"/><text x="758" y="130" class="t-side">Sky</text>
+                  <text x="758" y="164" class="t-side">Hills</text><text x="758" y="194" class="t-side">Sun</text>
+                  <text x="750" y="246" class="t-cap">IMAGE</text>
+                  <text x="758" y="276" class="t-side">4000 × 2667 px</text>
+                  <text x="758" y="304" class="t-side dim">18.4 MB</text>
+                  <rect x="764" y="500" width="198" height="40" rx="9" fill="#3a3658"/><text x="863" y="525" text-anchor="middle" class="t-btn">Export…</text>
+                </g>
+                <!-- a worksheet -->
+                <g data-for="maths">
+                  <rect width="1000" height="600" fill="#d9d6e4"/>
+                  <rect width="1000" height="34" fill="#c9c6d6"/>
+                  <text x="500" y="22" text-anchor="middle" class="t-dark-dim">worksheet 7.pdf</text>
+                  <rect x="40" y="58" width="540" height="560" fill="#fffefa"/>
+                  <text x="80" y="106" class="t-cap-dark">PYTHAGORAS · PRACTICE</text>
+                  <text x="80" y="160" class="t-q"><tspan font-weight="700">4.</tspan> A ladder 5 m long leans against a wall.</text>
+                  <text x="102" y="188" class="t-q">Its foot is 3 m from the wall. How high</text>
+                  <text x="102" y="216" class="t-q">up the wall does it reach?</text>
+                  <path d="M120 470 V300 L330 470 Z" fill="none" stroke="#2a2840" stroke-width="2"/>
+                  <path d="M120 452 h18 v18" fill="none" stroke="#2a2840" stroke-width="1.5"/>
+                  <text x="98" y="392" class="t-q small">h</text><text x="236" y="378" class="t-q small">5 m</text><text x="212" y="494" class="t-q small">3 m</text>
+                  <text x="80" y="548" class="t-q dim"><tspan font-weight="700">5.</tspan> A rectangle is 8 cm by 6 cm. Find its diagonal.</text>
+                </g>
+                <!-- a spreadsheet (its rows are drawn by point.js) -->
+                <g data-for="sheet">
+                  <rect width="1000" height="600" fill="#ffffff"/>
+                  <rect width="1000" height="34" fill="#e4efe7"/>
+                  <text x="500" y="22" text-anchor="middle" class="t-dark-dim">trip budget.xlsx</text>
+                  <rect y="34" width="1000" height="40" fill="#eef6f0"/>
+                  <rect x="20" y="88" width="560" height="34" rx="5" fill="#fff" stroke="#d6d6de"/>
+                  <text x="34" y="111" class="t-fx">fx</text><text x="80" y="111" class="t-code">=SUM(B2:B6)</text>
+                  <g class="sheet-grid"></g>
+                </g>
+              </svg>
+
+              <!-- Glyde's marks: drawn in as the voice reaches each one -->
+              <svg class="pa-marks" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+                <g data-for="photo">
+                  <path pathLength="1" class="mark" data-step="1" d="M760 520 C 758 494 828 488 866 490 C 914 492 968 500 966 522 C 964 546 900 552 860 550 C 812 548 760 546 760 520 C 760 506 772 498 790 494"/>
+                  <path pathLength="1" class="mark" data-step="2" d="M752 288 H 930"/>
+                  <path pathLength="1" class="mark" data-step="3" d="M752 314 H 836"/>
+                </g>
+                <g data-for="maths">
+                  <path pathLength="1" class="mark" data-step="1" d="M70 134 C 220 124 470 124 560 134 C 580 140 582 220 560 226 C 400 236 200 236 72 228 C 56 222 54 140 70 134 C 74 132 80 132 90 132"/>
+                  <path pathLength="1" class="mark" data-step="2" d="M110 304 C 110 360 110 420 112 470"/>
+                  <path pathLength="1" class="mark" data-step="2" d="M128 296 C 200 352 270 410 336 464"/>
+                </g>
+                <g data-for="sheet">
+                  <path pathLength="1" class="mark" data-step="1" d="M70 105 C 72 92 160 88 196 92 C 222 96 226 116 210 124 C 180 132 92 132 76 122 C 68 116 68 110 74 104"/>
+                  <path pathLength="1" class="mark hl" data-step="2" d="M24 460 H 576"/>
+                  <path pathLength="1" class="mark tick" data-step="3" d="M440 500 l 10 12 l 20 -26"/>
+                </g>
+              </svg>
+
+              <!-- the labels: dark pills edged in violet -->
+              <div class="pa-labels" aria-hidden="true">
+                <span class="pa-label" data-for="photo" data-step="1" style="left:62%;top:74%">Export</span>
+                <span class="pa-label" data-for="photo" data-step="2" style="left:50%;top:43%">make it 1600 wide</span>
+                <span class="pa-label" data-for="photo" data-step="3" style="left:85%;top:54%">about 1 MB</span>
+                <span class="pa-label" data-for="maths" data-step="1" style="left:42%;top:41%">this one</span>
+                <span class="pa-label" data-for="maths" data-step="2" style="left:3%;top:63%">h</span>
+                <span class="pa-label" data-for="sheet" data-step="1" style="left:24%;top:15.5%">stops at row 6</span>
+                <span class="pa-label" data-for="sheet" data-step="2" style="left:3%;top:89.5%">boat ride: left out</span>
+              </div>
+
+              <!-- Glyde's own pointer, which draws the marks -->
+              <span class="pa-pointer" aria-hidden="true"></span>
+
+              <!-- the notes beside the screen (photo, sheet) and the board (homework), opened away from the marks -->
+              <aside class="pa-notes" data-for="photo" aria-hidden="true">
+                <header><b>Glyde</b><i></i></header>
+                <p class="pa-asked">“How do I make this small enough to email?”</p>
+                <ol><li>Open <b>Export</b>, at the bottom of the right panel.</li><li>Set the width to <b>1600 px</b>; the height follows.</li><li>Quality <b>80%</b> gets it to about 1 MB.</li></ol>
+                <footer><span>Copy</span><span>Save to Notes</span></footer>
+              </aside>
+              <aside class="pa-notes right" data-for="sheet" aria-hidden="true">
+                <header><b>Glyde</b><i></i></header>
+                <p class="pa-asked">“Why is my total wrong?”</p>
+                <ol><li>The sum stops at <b>row 6</b>.</li><li>So the <b>boat ride</b> in row 7 isn’t counted.</li><li>Make it <b>=SUM(B2:B7)</b> and the total is 10,000.</li></ol>
+                <footer><span>Copy</span><span>Save to Notes</span></footer>
+              </aside>
+              <aside class="pa-board" data-for="maths" aria-hidden="true">
+                <p class="pa-asked">“How do I do question 4?”</p>
+                <div class="bl" data-step="1"><span class="hand">h² + 3² = 5²</span><span class="note">↳ the ladder is the long side</span></div>
+                <div class="bl" data-step="2"><span class="hand">h² = 25 − 9 = 16</span><span class="note">↳ take 3² from both sides</span></div>
+                <div class="bl" data-step="3"><span class="hand ans">h = 4 m</span></div>
+                <footer><span>Save to Notes</span></footer>
+              </aside>
+
+              <div class="pa-keys" aria-hidden="true"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>Q</kbd></div>
+              <div class="island-slot"><div id="pa-island" style="--h:80" data-max="1" data-fit="760"></div></div>
+            </div>
+          </div>
+          <p class="pa-caption" aria-live="polite"></p>
+          <button class="pa-replay" type="button" hidden>Play it again</button>
+        </div>
+        <p class="pa-small reveal">It only looks at your screen when you press the shortcut, and the picture is never kept. Its marks are left out of screenshots and screen sharing. Point &amp; Ask comes with Glyde AI, coming soon.</p>
+      </section>
+
+
+      <!-- ============================== BROWSER CONTROL ============================== -->
+      <!-- Drawn, not recorded: a browser, a made-up travel site and Glyde's pointer doing the job, step by step. -->
+      <section class="browser" id="browser" data-section="Browser control" aria-labelledby="browser-title">
+        <div class="section-head center reveal">
+          <p class="kicker"><span class="new-tag">Glyde AI · coming soon</span></p>
+          <h2 id="browser-title">It can use your browser, <span class="soft">too.</span></h2>
+          <p class="lede">Ask, and Glyde does it in Chrome or Edge with the Glyde extension. It searches, fills in forms and compares. You confirm anything that matters.</p>
+        </div>
+        <div class="bc reveal">
+          <div class="screen bc-device">
+            <div class="display bc-screen">
+              <div class="bc-win" aria-hidden="true">
+                <div class="bc-tabs"><span class="bc-tab on"><i></i>Skyfare · Flights</span><span class="bc-tab"><i class="g"></i>Inbox</span></div>
+                <div class="bc-bar">
+                  <span class="bc-nav">‹ › ↻</span>
+                  <span class="bc-url"><b>skyfare.example</b>/flights</span>
+                  <span class="bc-ext" title="Glyde"><i></i><i></i></span>
+                </div>
+                <div class="bc-page">
+                  <div class="bc-site"><b>Skyfare</b><span>Flights</span><span>Hotels</span><span>Trips</span></div>
+                  <div class="bc-form">
+                    <label class="bc-field"><small>From</small><span>Delhi</span></label>
+                    <label class="bc-field" data-bc="to"><small>To</small><span class="bc-typed"></span></label>
+                    <label class="bc-field" data-bc="date"><small>Date</small><span class="bc-date">Any day</span></label>
+                    <span class="bc-search" data-bc="search">Search</span>
+                  </div>
+                  <div class="bc-results">
+                    <div class="bc-sort"><span>Best</span><span data-bc="sort">Cheapest</span><span>Fastest</span></div>
+                    <div class="bc-list">
+                      <div class="bc-row" data-price="6190"><b>Monsoon Air</b><span>9:40 → 12:15</span><span>2h 35m</span><strong>₹6,190</strong></div>
+                      <div class="bc-row" data-price="4820"><b>Aster Air</b><span>6:10 → 8:45</span><span>2h 35m</span><strong>₹4,820</strong></div>
+                      <div class="bc-row" data-price="5340"><b>Bluejet</b><span>14:05 → 16:50</span><span>2h 45m</span><strong>₹5,340</strong></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <span class="bc-pointer" aria-hidden="true"></span>
+              <div class="island-slot"><div id="bc-island" style="--h:80" data-max="1" data-fit="700"></div></div>
+            </div>
+          </div>
+          <p class="bc-caption" aria-live="polite"></p>
+        </div>
+      </section>
+
       <section class="privacy" id="privacy" data-section="Privacy">
         <div class="section-head center reveal">
-          <p class="kicker">Privacy</p>
           <h2>Private <span class="soft">by design.</span></h2>
           <p class="lede">An app that sees your music, messages and clipboard has to earn that. Here's how Glyde does.</p>
         </div>
@@ -426,76 +459,98 @@
     <!-- ============================== PRICING ============================== -->
     <section class="pricing" id="pricing" data-section="Pricing">
       <div class="section-head center reveal">
-        <p class="kicker">Pricing</p>
         <h2>Free for good. <span class="soft">Pro, once.</span></h2>
-        <p class="lede">The island is free. Glyde Pro adds the assistant and the rest, for one payment, after a 14-day free trial. Glyde AI, a monthly add-on for Pro, is coming soon.</p>
+        <p class="lede">The island is free. Glyde Pro adds the assistant and the rest, for one payment, after a 14-day free trial. Glyde AI and Glyde AI Max, by the month, are coming soon.</p>
         <div class="currency" role="radiogroup" aria-label="Currency">
           <button role="radio" aria-checked="true" data-cur="usd">USD</button>
           <button role="radio" aria-checked="false" data-cur="inr">INR</button>
         </div>
       </div>
 
-      <div class="plans">
+      <div class="plans four">
         <article class="plan reveal">
+          <span class="plan-mark" data-dots="ghost" data-dot-color="#9a8cff" aria-hidden="true"></span>
           <h3>Free</h3>
           <p class="plan-for">The island, and everything it shows you.</p>
-          <p class="price"><b data-usd="$0" data-inr="₹0">$0</b><span>forever</span></p>
+          <p class="price"><b data-usd="$0" data-inr="₹0">₹0</b><span>for good</span></p>
+          <p class="price-pro">&nbsp;</p>
           <ul>
-            <li>The island: Glyde, the time and the weather</li>
-            <li>Now playing, with synced lyrics and its colours</li>
-            <li>Volume, brightness, battery and Bluetooth</li>
-            <li>The mic, camera and screen-recording dot</li>
-            <li>Downloads, file copies and live scores</li>
-            <li>The clock, with your next meeting</li>
+            <li>The island: Glyde, the time, the weather</li>
+            <li>Now playing, with lyrics</li>
+            <li>Volume, battery, Bluetooth and download notices</li>
+            <li>Live cricket and football</li>
+            <li>The clock: the date and what’s next</li>
           </ul>
           <a class="btn btn-ghost" href="#get" data-plan="free">Join the waitlist</a>
         </article>
 
-        <article class="plan pro reveal" style="--d:.08s">
+        <article class="plan pro reveal" style="--d:.06s">
           <span class="plan-badge">Pay once</span>
+          <span class="plan-mark" data-dots="star" data-dot-color="#ffd88a" aria-hidden="true"></span>
           <h3>Glyde Pro</h3>
-          <p class="plan-for">The assistant, and everything else. Yours to keep.</p>
-          <p class="price"><b data-usd="$14.99" data-inr="₹699">$14.99</b><span>one time</span></p>
+          <p class="plan-for">The assistant and the rest. Yours to keep.</p>
+          <p class="price"><b data-usd="$14.99" data-inr="₹699">₹699</b><span>once</span></p>
+          <p class="price-pro">14 days free to try</p>
           <ul>
-            <li>Everything in Free</li>
+            <li>Everything in Free, and:</li>
             <li>Glyde, the assistant: talk or type to it</li>
-            <li>Voice commands and “Hey&nbsp;Glyde”, in English and Hindi</li>
             <li>Timers, alarms and reminders</li>
-            <li>PC actions, split screen too</li>
+            <li>“Hey Glyde” and PC actions, split screen too</li>
+            <li>The Mac-style menu bar, and search</li>
             <li>Clipboard history and the file shelf</li>
             <li>Notifications, calls and meeting countdowns</li>
-            <li>The menu bar, search, screenshots and focus</li>
+            <li>Screenshots and the focus timer</li>
             <li>The teleprompter and camera mirror</li>
             <li>Your coding agents on the island, risky moves stopped</li>
-            <li>14 days free to try</li>
           </ul>
           <a class="btn btn-glow" href="#get" data-plan="pro"><span>Get early-bird pricing</span></a>
         </article>
 
-        <article class="plan ai reveal" style="--d:.16s">
+        <article class="plan ai reveal" style="--d:.12s">
           <span class="plan-badge ai">Coming soon</span>
+          <span class="plan-mark" data-dots="sparkle" data-dot-color="#8ef0ff" aria-hidden="true"></span>
           <h3>Glyde AI</h3>
-          <p class="plan-for">What goes beyond your PC. For Glyde Pro, a month at a time.</p>
-          <p class="price"><b data-usd="Soon" data-inr="Soon">Soon</b><span>a monthly add-on</span></p>
+          <p class="plan-for">What goes beyond your PC, a month at a time.</p>
+          <p class="price"><b data-usd="$5.99" data-inr="₹299">₹299</b><span>a month</span></p>
+          <p class="price-pro" data-usd="$3.99 a month if you own Glyde Pro" data-inr="₹199 a month if you own Glyde Pro">₹199 a month if you own Glyde Pro</p>
           <ul>
-            <li>Everything in Pro, and:</li>
-            <li>Answers to anything, with pictures</li>
+            <li>Glyde Pro’s tools, while it’s on</li>
+            <li>Answers to anything</li>
             <li>The news and the weather anywhere</li>
-            <li>Emails and WhatsApps, written for you</li>
-            <li>Copied text translated and rewritten</li>
-            <li>A natural voice, and instant hearing</li>
+            <li>Emails and WhatsApp messages, written for you</li>
+            <li>Copied text translated, summarised, rewritten</li>
+            <li>Point &amp; Ask: answers drawn over your screen</li>
+            <li>Browser control in Chrome and Edge, with the Glyde extension <span class="li-soon">Coming soon</span></li>
+            <li>Glyde’s natural voice, and instant hearing</li>
+          </ul>
+          <a class="btn btn-ghost" href="#get" data-plan="ai">Join the waitlist</a>
+        </article>
+
+        <article class="plan ai max reveal" style="--d:.18s">
+          <span class="plan-badge ai">Coming soon</span>
+          <span class="plan-mark" data-dots="sparkle" data-dot-color="#c9a2ff" aria-hidden="true"></span>
+          <h3>Glyde AI Max</h3>
+          <p class="plan-for">For heavy use and the hardest questions.</p>
+          <p class="price"><b data-usd="$19.99" data-inr="₹1,499">₹1,499</b><span>a month</span></p>
+          <p class="price-pro" data-usd="$17.99 a month if you own Glyde Pro" data-inr="₹1,349 a month if you own Glyde Pro">₹1,349 a month if you own Glyde Pro</p>
+          <ul>
+            <li>Everything in Glyde AI, and:</li>
+            <li>Browser control in Chrome and Edge, with the Glyde extension <span class="li-soon">Coming soon</span></li>
+            <li>About six times as much AI each month</li>
+            <li>More in one day, for heavy use</li>
+            <li>The smarter model for hard questions</li>
+            <li>New AI features first</li>
           </ul>
           <a class="btn btn-ghost" href="#get" data-plan="ai">Join the waitlist</a>
         </article>
       </div>
-      <p class="plans-note reveal">Planned prices; the Microsoft Store shows yours at launch. Glyde Pro is bought in the Microsoft Store and kept with your Microsoft account, so it unlocks on your other PCs too. Glyde AI is coming soon. Waitlist members get an early-bird price on Pro.</p>
+      <p class="plans-note reveal">Prices before launch; the Microsoft Store shows yours. Glyde Pro is bought once in the Microsoft Store and kept with your Microsoft account, so it unlocks on your other PCs too. Glyde AI and Glyde AI Max are monthly, cancel any time, and are coming soon.</p>
     </section>
 
     <!-- ============================== FAQ ============================== -->
     <section class="faq" id="faq" data-section="FAQ">
       <div class="section-head center reveal">
-        <p class="kicker">Questions</p>
-        <h2>Good <span class="soft">questions.</span></h2>
+        <h2>Questions, <span class="soft">answered.</span></h2>
       </div>
       <div class="faq-list">
         <details class="reveal">
@@ -524,11 +579,11 @@
         </details>
         <details class="reveal">
           <summary>What's Glyde AI, and what does it cost?</summary>
-          <div class="faq-a"><p>It's coming soon: a monthly add-on for Glyde Pro (planned at $2.99 or ₹149 a month). It answers anything (with a picture when it helps), writes emails and WhatsApps, works on what you've copied, and gives Glyde a natural voice and instant hearing. It runs through Glyde's own servers, so there are no keys to set up, and you can cancel any time from your Microsoft account. Without it, every command on your PC still works.</p></div>
+          <div class="faq-a"><p>It's coming soon, in two sizes. Glyde AI is ₹299 a month (₹199 if you own Glyde Pro), and Glyde AI Max is ₹1,499 a month (₹1,349 with Pro). It answers anything (with a picture when it helps), writes emails and WhatsApps, works on what you've copied, and gives Glyde a natural voice and instant hearing. There are no keys to set up, and you can cancel any time from your Microsoft account. Without it, every command on your PC still works.</p></div>
         </details>
         <details class="reveal">
           <summary>What are coding agents?</summary>
-          <div class="faq-a"><p>If you code with Claude Code or Codex, Glyde shows each session on the island: what it's doing, when it's done, and when it needs you. Allow or Deny Claude Code's requests right there, and get a soft ping when one is waiting while you're in another window. Before Claude Code does something that can't be undone, like wiping a database or deleting a folder, it waits: the island glows red, Glyde says why, and only the island can allow it. They come with Glyde Pro.</p></div>
+          <div class="faq-a"><p>If you code with an AI coding tool in the terminal, Glyde shows each session on the island: what it's doing, when it's done, and when it needs you. Allow or Deny its requests right there, and get a soft ping when one is waiting while you're in another window. Before it does something that can't be undone, like wiping a database or deleting a folder, it waits: the island glows red, Glyde says why, and only the island can allow it. They come with Glyde Pro.</p></div>
         </details>
         <details class="reveal">
           <summary>Will it get in the way of games or films?</summary>
@@ -547,7 +602,6 @@
         <div class="letter-head">
           <span class="signer-mark" aria-hidden="true">S</span>
           <div>
-            <p class="kicker">From the founder</p>
             <h2 class="letter-title" id="founder-title">Why I'm building Glyde</h2>
           </div>
         </div>
@@ -568,7 +622,7 @@
       </div>
       <div class="final-inner">
         <div id="final-island" class="halo-glow" style="--h:70" data-max="1.5" data-fit="400"></div>
-        <h2 class="reveal">Get <em class="halo-word">the halo.</em></h2>
+        <h2 class="reveal">Get Glyde.</h2>
         <p class="lede launch-only reveal" style="--d:.1s">Two ways to install. Both free to start.</p>
         <p class="lede prelaunch-only reveal" style="--d:.1s">Coming soon for Windows 10 and 11. Free to start.</p>
 
@@ -615,11 +669,13 @@
       <nav aria-label="Footer">
         <a href="#features">Features</a>
         <a href="#voice">Voice</a>
+        <a href="#point">Point &amp; Ask</a>
         <a href="#privacy">Privacy</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
         <a href="#get" data-download>Download</a>
         <a href="#get" data-store>Microsoft Store</a>
+        <a href="changelog.html">Changelog</a>
         <a href="privacy.html">Privacy policy</a>
         <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false">Pause animations</button>
       </nav>
