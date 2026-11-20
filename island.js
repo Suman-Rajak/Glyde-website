@@ -334,6 +334,10 @@
       this.cleanup = null;
       this.raf = 0;
       this.tick = this.tick.bind(this);
+      // (its looping animations rest while it's off screen: nothing moves where nobody can see it)
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(([entry]) => stage.classList.toggle('away', !entry.isIntersecting), { rootMargin: '80px' }).observe(stage);
+      }
       this.paint();
 
       if (options.music) {
@@ -539,7 +543,7 @@
       const ring = q('.ring-fg');
       if (ring) ring.style.strokeDasharray = `${(100 * player.position / t.duration).toFixed(1)} 100`;
       if (q('.me-fill')) {
-        q('.me-fill').style.width = (100 * player.position / t.duration).toFixed(2) + '%';
+        q('.me-fill').style.transform = `scaleX(${(player.position / t.duration).toFixed(4)})`;
         q('.me-el').textContent = fmt(player.position);
         q('.me-rem').textContent = '-' + fmt(t.duration - player.position);
       }

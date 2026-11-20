@@ -124,8 +124,14 @@
     tour(items().indexOf(button));
   });
 
+  const paused = () => document.documentElement.classList.contains('still');
+  document.addEventListener('glyde:still', e => {
+    if (e.detail) token++;
+    else if (visible) tour(Math.max(0, items().findIndex(b => b.getAttribute('aria-pressed') === 'true')));
+  });
   new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
+    if (visible && paused()) { if (!items().some(b => b.getAttribute('aria-pressed') === 'true')) play(items()[0], token); return; }
     if (visible) tour(Math.max(0, items().findIndex(b => b.getAttribute('aria-pressed') === 'true')));
     else token++;
   }, { threshold: 0.3 }).observe(root);

@@ -7,6 +7,8 @@
 
   const mark = document.querySelector('.wm-text');
   if (!mark || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // (its passing sheen rests while the hero is off screen)
+  new IntersectionObserver(([entry]) => mark.classList.toggle('resting', !entry.isIntersecting)).observe(mark);
   const hero = document.querySelector('.hero') || document.body;
   let frame = 0, x = 0, y = 0;
 

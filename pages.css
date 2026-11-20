@@ -1,0 +1,49 @@
+/*
+  Glyde website: the reading pages (privacy policy, terms). Dark, like the top of the home page and the
+  changelog, with the same bar and footer; one column of text that's easy to read.
+*/
+body { background: #07061a; color: #e9e7f7; }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(60% 40% at 50% 0, rgba(124, 108, 255, .26), transparent 70%); }
+.doc-dots { position: absolute; inset: 0 0 auto; height: 480px; z-index: -1; pointer-events: none; background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'><defs><pattern id='p' width='24' height='24' patternUnits='userSpaceOnUse'><circle cx='12.0' cy='12.0' r='1.2' fill='rgba(200,190,255,.24)'/></pattern><radialGradient id='g' cx='0.5' cy='0' r='0.7'><stop offset='0.2' stop-color='white'/><stop offset='0.95' stop-color='white' stop-opacity='0'/></radialGradient><mask id='m'><rect width='100%' height='100%' fill='url(%23g)'/></mask></defs><rect width='100%' height='100%' fill='url(%23p)' mask='url(%23m)'/></svg>") 0 0 / 100% 100% no-repeat; }
+
+/* the bar, on the dark */
+.topbar .brand, .topbar .brand-name { color: #fff; }
+.topbar .tb-links a { color: rgba(238, 240, 255, .74); }
+.topbar .tb-links a:hover, .topbar .tb-links a[aria-current="page"] { background: rgba(255, 255, 255, .09); color: #fff; }
+.topbar .btn-dark { background: #fff; color: #0d1024; }
+.topbar::before { background: linear-gradient(180deg, rgba(8, 10, 28, .75), rgba(8, 10, 28, 0)); }
+@media (max-width: 1080px) { .tb-links.always { display: flex; } .tb-links.always a:not([aria-current]) { display: none; } }
+@media (max-width: 480px) { .tb-links.always { display: none !important; } }
+
+/* the text */
+.doc { max-width: 760px; margin: 0 auto; padding: 140px var(--gutter) 96px; }
+.doc h1 { font-size: clamp(2.5rem, 6vw, 3.75rem); letter-spacing: -.045em; color: #fff; margin: 0 0 12px; }
+.doc .updated { color: rgba(238, 240, 255, .62); font-size: .9375rem; }
+.doc .summary { margin: 28px 0 8px; padding: 20px 24px; border-radius: 18px; background: rgba(255, 255, 255, .05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .09); }
+.doc .summary p + p { margin-top: 8px; }
+.doc h2 { font-size: 1.5rem; letter-spacing: -.02em; color: #fff; margin: 44px 0 12px; }
+.doc h3 { font-size: 1.0625rem; color: #fff; margin: 26px 0 8px; }
+.doc p, .doc li { color: rgba(233, 231, 247, .82); line-height: 1.65; }
+.doc p + p { margin-top: 12px; }
+.doc ul { margin: 10px 0 0; padding-left: 20px; }
+.doc li + li { margin-top: 8px; }
+.doc strong { color: #fff; font-weight: 600; }
+.doc a { color: #c9c0ff; text-underline-offset: 3px; }
+.doc a:hover { color: #fff; }
+.doc table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: .9375rem; }
+.doc th, .doc td { text-align: left; vertical-align: top; padding: 11px 12px 11px 0; border-bottom: 1px solid rgba(255, 255, 255, .09); color: rgba(233, 231, 247, .8); }
+.doc th { color: #fff; font-weight: 600; font-size: .8125rem; letter-spacing: .04em; text-transform: uppercase; }
+@media (max-width: 560px) {
+  .doc table, .doc thead, .doc tbody, .doc tr, .doc th, .doc td { display: block; }
+  .doc thead { display: none; }
+  .doc td { border: 0; padding: 2px 0; }
+  .doc tr { padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, .09); }
+  .doc td:first-child { color: #fff; font-weight: 600; }
+}
+
+/* the footer, on the dark */
+.footer { background: #07061a; }
+.footer-inner { border-top-color: rgba(255, 255, 255, .08); }
+.footer .brand, .footer .brand-name, .footer nav a { color: rgba(238, 240, 255, .82); }
+.footer nav a:hover { color: #fff; }
+.footer .fine { color: rgba(238, 240, 255, .62); }

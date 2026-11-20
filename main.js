@@ -7,8 +7,8 @@
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
   // ---- Pausing animations --------------------------------------------------------------------
-  // "Pause animations" (by the drifting phrases, and in the footer) stops what moves by itself:
-  // the islands' little stories, the phrases, the motes of light and the page's looping glows.
+  // "Pause animations" stops what moves by itself: the islands' little stories, the demos
+  // and the page's looping glows.
   // Remembered on this device. Everything still works when you use it.
 
   let still = false;
@@ -31,8 +31,11 @@
     directors.forEach(d => { d.pauseUntil = on ? Infinity : 0; });
     $$('[data-motion-toggle]').forEach(b => {
       b.setAttribute('aria-pressed', String(on));
-      b.textContent = on ? 'Play animations' : 'Pause animations';
+      const label = b.querySelector('.mt-label') || b;
+      label.textContent = on ? 'Play animations' : 'Pause animations';
+      b.title = label.textContent;
     });
+    document.dispatchEvent(new CustomEvent('glyde:still', { detail: on })); // (the demos in their own scripts)
     if (save) try { localStorage.setItem('glyde-still', on ? '1' : '0'); } catch (err) { /* storage blocked */ }
     whenStillChanges.forEach(fn => fn(on));
   }
@@ -41,6 +44,8 @@
 
   // Links and the waitlist backend live in config.js.
   const CONFIG = window.WINISLAND || {};
+  // Can the browser move things with the scroll by itself (CSS scroll-driven animations)? Then no script does it.
+  const scrollDriven = Boolean(window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()'));
   const LAUNCHED = Boolean(CONFIG.downloadUrl || CONFIG.storeUrl);
   document.documentElement.classList.toggle('launched', LAUNCHED);
 
@@ -95,22 +100,6 @@
     });
     new MutationObserver(sync).observe(group, { subtree: true, attributes: true, attributeFilter: ['aria-checked'] });
     sync();
-  }
-
-  // ---- "And there's more": the first six, then the rest on asking -------------------------
-
-  const moreGrid = $('#more-grid');
-  const moreToggle = $('.more-toggle');
-  const moreCount = moreGrid ? moreGrid.children.length : 0;
-  if (moreCount > 6) {
-    moreToggle.hidden = false;
-    moreToggle.textContent = `Show all ${moreCount}`;
-    moreToggle.addEventListener('click', () => {
-      const all = moreGrid.classList.toggle('all');
-      moreToggle.setAttribute('aria-expanded', String(all));
-      moreToggle.textContent = all ? 'Show fewer' : `Show all ${moreCount}`;
-      if (all) $$('li', moreGrid).slice(6).forEach(li => li.classList.add('in')); // (no waiting to scroll in)
-    });
   }
 
   // ---- FAQ: answers close the way they opened ----------------------------------------------
@@ -252,7 +241,7 @@
       key: 'nav-' + section.id, shape: [Math.max(140, width), 34, 17], cls: 'v-navc',
       html: '<svg class="ring" viewBox="0 0 20 20" aria-hidden="true"><circle class="ring-bg" cx="10" cy="10" r="8"/><circle class="ring-fg" cx="10" cy="10" r="8" pathLength="100"/></svg>' +
         `<b>${esc(section.label)}</b><span class="ic">${ICON.grid}</span>`,
-      apply: el => { el.querySelector('.ring-fg').style.strokeDashoffset = (100 - scrollProgress() * 100).toFixed(1); },
+      apply: el => { if (!scrollDriven) el.querySelector('.ring-fg').style.strokeDashoffset = (100 - scrollProgress() * 100).toFixed(1); },
     };
   }
 
@@ -313,7 +302,7 @@
       if (!entry.isIntersecting) return;
       const id = entry.target.id;
       currentSection = SECTIONS.find(s => s.id === id) || SECTIONS[0];
-      topbar.classList.toggle('on-night', id === 'voice' || id === 'privacy' || id === 'point' || id === 'browser' || id === 'top');
+      topbar.classList.toggle('on-night', id === 'voice' || id === 'privacy' || id === 'point' || id === 'browser' || id === 'top' || id === 'get');
       navIsland.setNeutral(id !== 'music');
       nav.refresh();
     });
@@ -355,18 +344,6 @@
     try { await heroScripts[name](ctx); } finally { if (ctx.alive()) chipFor(name)?.classList.remove('active'); }
   };
 
-  $$('.try .chip').forEach(chip => chip.addEventListener('click', () => {
-    hold(hero, 8000);
-    hero.setHover(false);
-    hero.run(tagged(chip.dataset.demo));
-  }));
-
-  const hint = $('.hover-hint');
-  const noHover = matchMedia('(hover: none)');
-  const labelHint = () => { hint.lastChild.textContent = noHover.matches ? 'Tap the island' : 'Hover the island'; };
-  labelHint();
-  noHover.addEventListener('change', labelHint);
-  hero.onHover = on => { if (on) hint.classList.add('gone'); };
   hero.autoplay(['notification', 'volume', 'timer', 'bluetooth', 'siro', 'battery', 'privacy', 'brightness'].map(tagged), { gap: 2600, start: 2400 });
 
   // Taskbar clock
@@ -391,222 +368,6 @@
         pending = null;
       });
     });
-  }
-
-  // ---- Story: how it lives -------------------------------------------------------------------
-
-  if ($('#story-screen')) {
-  const storyScreen = $('#story-screen');
-  const storyIsland = new Island($('#story-island'), { music: true });
-  let storyStep = 0;
-  const story = new Director(storyIsland, {
-    base: () => (storyStep === 0 ? V.idle() : V.mediaCompact()),
-    expanded: expandedView,
-  });
-  islandActions(story);
-  story.canAutoplay = () => storyStep === 1;
-  story.autoplay([
-    async ({ show, wait }) => { show(V.bluetooth('Aurora Buds Pro', 80)); await wait(2600); },
-    levelScript('volume', [40, 52, 64]),
-    async ({ show, wait }) => { show(V.battery(64)); await wait(2400); },
-    async ({ show, wait }) => { show(V.notification(MESSAGES[1])); await wait(3200); },
-  ], { gap: 1600, start: 300 });
-
-  function setStoryStep(step) {
-    if (step === storyStep) return;
-    storyStep = step;
-    storyScreen.dataset.step = step;
-    $$('.story-steps li').forEach(li => li.classList.toggle('on', Number(li.dataset.step) === step));
-    $$('.story-dots i').forEach((dot, i) => dot.classList.toggle('on', i === step));
-    if (step !== 1) story.stop();
-    storyIsland.setNeutral(step === 0);
-    story.forced = step === 2;
-    story.tab = 0;
-    story.refresh();
-  }
-  $('.story-steps li').classList.add('on');
-  storyIsland.setNeutral(true);
-  const stepObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => { if (entry.isIntersecting) setStoryStep(Number(entry.target.dataset.step)); });
-  }, { rootMargin: '-48% 0px -48% 0px' });
-  $$('.story-steps li').forEach(li => stepObserver.observe(li));
-  }
-
-  // ---- Feature cards ---------------------------------------------------------------------------
-  // (only if the old cards are on the page; the feature explorer, features.js, has taken their place)
-  if ($('.bento')) {
-
-  const card = name => $(`[data-card="${name}"]`);
-
-  // Now playing: the full player, always open.
-  if (card('music')) new Director(new Island(card('music'), { music: true }), { base: () => V.mediaExpanded(false) });
-
-  // Notifications: hover the banner to read it all.
-  let messageIndex = 0;
-  const notif = new Director(new Island(card('notification')), {
-    base: () => V.notification(MESSAGES[messageIndex]),
-    expanded: () => V.notificationExpanded(MESSAGES[messageIndex]),
-  });
-  const nextMessage = async ({ show, wait }) => {
-    show(V.idle());
-    if (!await wait(900)) return;
-    messageIndex = (messageIndex + 1) % MESSAGES.length;
-  };
-  notif.onAction = act => {
-    if (act === 'open' || act === 'clear') { notif.setHover(false); notif.run(nextMessage); }
-  };
-  notif.autoplay([nextMessage], { gap: 4200, start: 4200 });
-
-  // Volume and brightness over the music.
-  const level = new Director(new Island(card('level'), { music: true }), { base: () => V.mediaCompact() });
-  level.autoplay([levelScript('volume', [30, 44, 58, 70]), levelScript('brightness', [82, 66, 50])], { gap: 1600, start: 700 });
-
-  // Battery: charging, full, low.
-  const battery = new Director(new Island(card('battery')), { base: () => V.idle() });
-  battery.autoplay([
-    async ({ show, wait }) => { show(V.battery(64, 'charging')); await wait(2800); },
-    async ({ show, wait }) => { show(V.battery(100, 'full')); await wait(2600); },
-    async ({ show, wait }) => { show(V.battery(20, 'low')); await wait(2600); },
-  ], { gap: 1100, start: 900 });
-
-  // Bluetooth: earbuds connect, a speaker leaves.
-  const bluetooth = new Director(new Island(card('bluetooth')), { base: () => V.idle() });
-  bluetooth.autoplay([
-    async ({ show, wait }) => { show(V.bluetooth('Aurora Buds Pro', 80)); await wait(3000); },
-    async ({ show, wait }) => { show(V.bluetooth('Living Room Speaker', 0, false)); await wait(2400); },
-  ], { gap: 1100, start: 1100 });
-
-  // Clipboard: the tabs work, rows "copy".
-  const clipboard = new Director(new Island(card('clipboard'), { music: true }), { base() { return expandedView(this.tab); } });
-  clipboard.tab = 3;
-  clipboard.refresh();
-  islandActions(clipboard);
-
-  // Timers: a countdown, then a reminder ringing with Snooze and Stop.
-  const timers = new Director(new Island(card('timers')), { base: () => V.idle() });
-  const ringing = async ({ show, wait }) => {
-    show(V.timerRinging('Call Mom', 'Reminder · 5:00 PM'));
-    await wait(5200);
-  };
-  timers.onAction = act => {
-    if (act === 'timer-stop' || act === 'timer-snooze') {
-      hold(timers, 2500);
-      timers.stop();
-    }
-  };
-  timers.autoplay([countdown('10 minute timer', 584, 4200), ringing], { gap: 1200, start: 900 });
-
-  // Microphone and camera.
-  const privacy = new Director(new Island(card('privacy')), { base: () => V.idle() });
-  privacy.autoplay([
-    async ({ show, wait, island }) => {
-      island.setBubble(true, false);
-      show(V.privacy('Discord'));
-      if (!await wait(2600)) return;
-      show(null);
-      await wait(2200);
-    },
-    async ({ show, wait, island }) => {
-      island.setBubble(true, true);
-      show(V.privacy('Zoom', 'Camera'));
-      if (!await wait(2600)) return;
-      show(null);
-      await wait(2200);
-    },
-  ], { gap: 900, start: 1300 });
-
-  // Fullscreen: a film takes over and the island steps aside.
-  const fsDemo = $('.fs-demo');
-  const fsLabel = $('.fs-label');
-  const fs = new Director(new Island(card('fullscreen'), { music: true }), { base: () => V.mediaCompact() });
-  let fullscreen = false;
-  fsLabel.textContent = 'On the desktop';
-  setInterval(() => {
-    if (!fs.visible || document.hidden) return;
-    fullscreen = !fullscreen;
-    fsDemo.dataset.full = fullscreen ? '1' : '0';
-    fsLabel.textContent = fullscreen ? 'Fullscreen film: island hidden' : 'On the desktop';
-  }, 3200);
-
-  // ---- File shelf: drag files onto the island ------------------------------------------------
-
-  const shelfDemo = $('.shelf-demo');
-  const shelfIsland = new Island(card('shelf'));
-  const shelfItems = [];
-  const shelf = new Director(shelfIsland, { base: () => (shelfItems.length ? V.shelf(shelfItems) : V.idle()) });
-  const dropView = over => ({
-    key: over ? 'drop-over' : 'drop', shape: over ? [250, 44, 22] : [200, 34, 17], cls: 'v-drop',
-    html: `<span class="ic">${ICON.tray}</span>${over ? 'Let go to shelve it' : 'Drop files here'}`,
-  });
-
-  function addToShelf(button) {
-    shelfItems.push({ kind: button.dataset.kind, name: button.dataset.name });
-    button.classList.add('used');
-    shelfDemo.classList.add('has-items');
-    shelf.transient = null;
-    shelf.refresh();
-    if (shelfItems.length === 3) setTimeout(resetShelf, 5200);
-  }
-
-  function resetShelf() {
-    shelfItems.length = 0;
-    $$('.drag-file').forEach(b => b.classList.remove('used'));
-    shelfDemo.classList.remove('has-items');
-    shelf.refresh();
-  }
-
-  $$('.drag-file').forEach(button => {
-    button.addEventListener('click', e => { if (e.detail === 0) addToShelf(button); }); // keyboard
-    button.addEventListener('pointerdown', e => {
-      if (e.button !== 0) return;
-      e.preventDefault();
-      const startX = e.clientX, startY = e.clientY;
-      let ghost = null, over = false;
-
-      const overIsland = (x, y) => {
-        const r = shelfIsland.el.getBoundingClientRect();
-        const pad = 36;
-        return x > r.left - pad && x < r.right + pad && y > r.top - pad && y < r.bottom + pad;
-      };
-      const move = ev => {
-        if (!ghost) {
-          if (Math.hypot(ev.clientX - startX, ev.clientY - startY) < 5) return;
-          ghost = button.cloneNode(true);
-          ghost.classList.add('drag-ghost');
-          document.body.appendChild(ghost);
-          button.style.opacity = '.3';
-          shelf.transient = dropView(false);
-          shelf.refresh();
-        }
-        ghost.style.left = ev.clientX + 'px';
-        ghost.style.top = ev.clientY + 'px';
-        const now = overIsland(ev.clientX, ev.clientY);
-        if (now !== over) { over = now; shelf.transient = dropView(over); shelf.refresh(); }
-      };
-      const up = () => {
-        removeEventListener('pointermove', move);
-        removeEventListener('pointerup', up);
-        removeEventListener('pointercancel', up);
-        button.style.opacity = '';
-        if (!ghost) { addToShelf(button); return; } // a plain click
-        if (over) {
-          ghost.animate([{ opacity: 1 }, { opacity: 0, transform: 'translate(-50%, -50%) scale(.2)' }], { duration: 260, easing: 'ease-in' }).onfinish = () => ghost.remove();
-          addToShelf(button);
-        } else {
-          const r = button.getBoundingClientRect();
-          ghost.animate([
-            { left: ghost.style.left, top: ghost.style.top },
-            { left: r.left + r.width / 2 + 'px', top: r.top + r.height / 2 + 'px' },
-          ], { duration: 380, easing: 'cubic-bezier(.2,.9,.3,1.2)' }).onfinish = () => ghost.remove();
-          shelf.transient = null;
-          shelf.refresh();
-        }
-      };
-      addEventListener('pointermove', move);
-      addEventListener('pointerup', up);
-      addEventListener('pointercancel', up);
-    });
-  });
   }
 
   // ---- Music colours ----------------------------------------------------------------------------
@@ -754,69 +515,26 @@
     if (e.ctrlKey && e.altKey && e.code === 'KeyS') { e.preventDefault(); summonGlyde(); }
   });
 
-  // "Try the waves with your voice": loudness only, measured in the browser.
-  const voiceButton = $('#voice-btn');
-  const voiceLabel = $('.vb-label', voiceButton);
-  let mic = null;
-
-  async function startMic() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
-      const context = new (window.AudioContext || window.webkitAudioContext)();
-      const analyser = context.createAnalyser();
-      analyser.fftSize = 1024;
-      context.createMediaStreamSource(stream).connect(analyser);
-      const data = new Float32Array(analyser.fftSize);
-      mic = { stream, context, timer: setTimeout(() => stopMic(true), 30000) };
-      voice.source = () => {
-        analyser.getFloatTimeDomainData(data);
-        let sum = 0;
-        for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
-        return Math.min(1, Math.sqrt(sum / data.length) * 10);
-      };
-      voiceButton.setAttribute('aria-pressed', 'true');
-      voiceLabel.textContent = 'Listening… tap to stop';
-      siro.run(async ({ show, wait }) => {
-        show(V.siroListening());
-        while (await wait(400)) { if (!mic) return; }
-      });
-    } catch (err) {
-      voiceLabel.textContent = 'The microphone isn’t available here';
-      setTimeout(() => { voiceLabel.textContent = 'Try it with your voice'; }, 2600);
-    }
-  }
-
-  function stopMic(answer) {
-    if (!mic) return;
-    clearTimeout(mic.timer);
-    mic.stream.getTracks().forEach(track => track.stop());
-    mic.context.close();
-    mic = null;
-    voice.source = null;
-    voiceButton.setAttribute('aria-pressed', 'false');
-    voiceLabel.textContent = 'Try it with your voice';
-    if (answer) {
-      hold(siro, 6000);
-      siro.run(async ({ show, wait }) => {
-        show(V.siroThinking());
-        if (!await wait(500)) return;
-        show(V.siroAnswer('…', 'That was you. In the app, I’d act on it.'));
-        await wait(3400);
-      });
-    }
-  }
-
-  voiceButton.addEventListener('click', () => (mic ? stopMic(true) : startMic()));
-
   // Stars over the night sky, twinkling (and the aurora drifting) only while it's on screen.
   const stars = $('.stars');
   const night = $('.night');
   new IntersectionObserver(entries => { night.classList.toggle('away', !entries[entries.length - 1].isIntersecting); }).observe(night);
-  stars.innerHTML = Array.from({ length: 70 }, () => {
-    const z = (Math.random() * 1.6 + .8).toFixed(1);
-    return `<i style="left:${(Math.random() * 100).toFixed(2)}%;top:${(Math.random() * 100).toFixed(2)}%;--z:${z}px;` +
-      `--t:${(2 + Math.random() * 4).toFixed(1)}s;--dl:${(-Math.random() * 6).toFixed(1)}s;--o:${(.5 + Math.random() * .5).toFixed(2)}"></i>`;
-  }).join('');
+  // Stars, drawn once into a small picture that tiles (cheap to show, however tall the night is): two layers that
+  // twinkle in turn.
+  const starTile = (n, size) => {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const g = c.getContext('2d');
+    for (let i = 0; i < n; i++) {
+      const r = Math.random() * .8 + .5, a = .55 + Math.random() * .45;
+      const x = Math.random() * size, y = Math.random() * size;
+      const glow = g.createRadialGradient(x, y, 0, x, y, r * 3);
+      glow.addColorStop(0, `rgba(255,255,255,${a})`); glow.addColorStop(.35, `rgba(255,255,255,${a * .6})`); glow.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = glow; g.fillRect(x - r * 3, y - r * 3, r * 6, r * 6);
+    }
+    return c.toDataURL('image/png');
+  };
+  stars.innerHTML = `<i class="star-layer a" style="background-image:url(${starTile(22, 720)})"></i><i class="star-layer b" style="background-image:url(${starTile(20, 640)})"></i>`;
 
   // ---- Final call ----------------------------------------------------------------------------
 
@@ -826,6 +544,27 @@
     async ({ show, wait }) => { show(V.notification(MESSAGES[2])); await wait(3600); },
     async ({ show, wait }) => { show(V.battery(100, 'full')); await wait(2600); },
   ], { gap: 2200, start: 800 });
+
+  // ---- Quotes: real ones only, from config.js (the section stays hidden while there are none) ------
+
+  if (Array.isArray(CONFIG.quotes) && CONFIG.quotes.length) {
+    const list = $('.quote-list');
+    CONFIG.quotes.forEach(q => {
+      const card = document.createElement(q.url ? 'a' : 'figure');
+      card.className = 'quote reveal in';
+      if (q.url) { card.href = q.url; card.target = '_blank'; card.rel = 'noopener'; }
+      const text = document.createElement('blockquote');
+      text.textContent = q.text;
+      const by = document.createElement('figcaption');
+      const name = document.createElement('b');
+      name.textContent = q.name || '';
+      by.append(name);
+      if (q.role) { const role = document.createElement('span'); role.textContent = q.role; by.append(role); }
+      card.append(text, by);
+      list.append(card);
+    });
+    $('#quotes').hidden = false;
+  }
 
   // ---- Pricing currency ------------------------------------------------------------------------
 
@@ -920,8 +659,6 @@
         $('.form-msg', f).textContent = thanks;
       });
       burst(button);
-      joined = true;
-      updateDock();
       nav.setHover(false);
       nav.run(async ({ show, wait }) => { show(V.notification(welcome)); await wait(4500); });
     } catch (err) {
@@ -932,143 +669,6 @@
       label.textContent = original;
     }
   }));
-
-  // ---- The story, word by word ---------------------------------------------------------------
-  // The sentence lights up as you scroll through its pinned section, and the island above it acts
-  // out the phrase lit last: the music, the message, the dying earbuds, the timer.
-
-  const storyLine = $('.manifesto');
-  let updateStoryLine = () => {};
-  if (storyLine) {
-  const storyLinePin = $('.manifesto-pin');
-  const lineIsland = new Island($('#story-line-island'), { music: true });
-  const words = [];
-  (function wrapWords(node, cue) {
-    [...node.childNodes].forEach(child => {
-      if (child.nodeType === Node.TEXT_NODE) {
-        const pieces = document.createDocumentFragment();
-        child.textContent.split(/(\s+)/).forEach(part => {
-          if (!part) return;
-          if (/^\s+$/.test(part)) { pieces.append(part); return; }
-          const word = document.createElement('span');
-          word.className = 'w';
-          word.textContent = part;
-          word.dataset.cueOf = cue;
-          words.push(word);
-          pieces.append(word);
-        });
-        child.replaceWith(pieces);
-      } else if (child.nodeType === Node.ELEMENT_NODE) {
-        wrapWords(child, child.dataset.cue || cue);
-      }
-    });
-  })($('[data-words]'), '');
-
-  const CUE_VIEWS = {
-    music: () => V.mediaCompact(),
-    message: () => V.notification(MESSAGES[0]),
-    earbuds: () => V.bluetooth('Aurora Buds Pro', 10),
-    timer: () => V.timerCountdown('10 minute timer', 312),
-    glyde: () => V.siroAnswer('Hey Glyde', 'Hi! Try “next song”, “volume 30” or “open Chrome”.'),
-  };
-  let litCount = -1;
-  let shownCue = null;
-  lineIsland.setNeutral(true);
-  lineIsland.show(V.idle());
-
-  updateStoryLine = function () {
-    const box = storyLine.getBoundingClientRect();
-    if (box.bottom < -200 || box.top > innerHeight + 200) return;
-    const progress = reduceMotion ? 1 : Math.min(1, Math.max(0, -box.top / (box.height - innerHeight)));
-    const lit = Math.min(words.length, Math.round(progress * words.length * 1.15));
-    if (lit === litCount) return;
-    litCount = lit;
-    words.forEach((word, i) => word.classList.toggle('on', i < lit));
-    let cue = '';
-    for (let i = lit - 1; i >= 0 && !cue; i--) cue = words[i].dataset.cueOf;
-    if (cue === shownCue) return;
-    shownCue = cue;
-    lineIsland.setNeutral(cue !== 'music');
-    lineIsland.show((CUE_VIEWS[cue] || V.idle)());
-    storyLinePin.classList.toggle('lit', cue === 'glyde' || cue === 'glance');
-  };
-  }
-
-  // ---- Just say it: phrases drifting both ways, faster while you scroll ----------------------
-
-  const marquees = $$('.marquee').map(el => {
-    const track = $('.marquee-track', el);
-    const count = track.children.length;
-    track.innerHTML = track.innerHTML.repeat(3); // enough copies to never show an edge
-    return { el, track, count, speed: parseFloat(el.dataset.speed) || 30, offset: 0, unit: 0, visible: false };
-  });
-  const measureMarquees = () => marquees.forEach(m => {
-    m.unit = m.track.children[m.count].offsetLeft - m.track.children[0].offsetLeft; // one copy's width
-  });
-
-  if (!reduceMotion) {
-    let raf = 0, lastFrame = 0, lastScroll = scrollY, boost = 0;
-    const frame = now => {
-      const dt = Math.min(0.05, (now - lastFrame) / 1000);
-      lastFrame = now;
-      boost += (Math.min(Math.abs(scrollY - lastScroll), 120) - boost) * 0.12; // smoothed scroll speed
-      lastScroll = scrollY;
-      marquees.forEach(m => {
-        if (!m.visible || !m.unit) return;
-        m.offset += m.speed * (1 + boost / 5) * dt;
-        const x = ((m.offset % m.unit) + m.unit) % m.unit;
-        m.track.style.transform = `translate3d(${-x}px, 0, 0)`;
-      });
-      raf = !still && marquees.some(m => m.visible) ? requestAnimationFrame(frame) : 0;
-    };
-    const start = () => {
-      if (raf || still || !marquees.some(m => m.visible)) return;
-      lastFrame = performance.now();
-      lastScroll = scrollY;
-      raf = requestAnimationFrame(frame);
-    };
-    const watcher = new IntersectionObserver(entries => {
-      entries.forEach(entry => { marquees.find(m => m.el === entry.target).visible = entry.isIntersecting; });
-      start();
-    });
-    whenStillChanges.push(start);
-    marquees.forEach(m => watcher.observe(m.el));
-    measureMarquees();
-    addEventListener('resize', measureMarquees);
-    if (document.fonts) document.fonts.ready.then(measureMarquees);
-  }
-
-  // ---- Floating "Get Glyde" island -----------------------------------------------------------
-  // Slides up once you're past the story; out of the way at the Get section, the very end, after
-  // signing up, or once closed (for this visit).
-
-  const dock = $('.dock');
-  let joined = false;
-  let getInView = false;
-  let dockClosed = false;
-  try { dockClosed = sessionStorage.getItem('glyde-dock') === 'closed'; } catch (err) { /* storage blocked */ }
-  dock.hidden = false;
-  if (LAUNCHED) {
-    $('[data-dock-note]', dock).textContent = 'Free for Windows 10 & 11';
-    const cta = $('[data-dock-cta]', dock);
-    cta.href = CONFIG.downloadUrl || CONFIG.storeUrl;
-    cta.innerHTML = '<span class="long">Download free</span><span class="short">Get</span>';
-  }
-  $('.dock-x', dock).addEventListener('click', () => {
-    dockClosed = true;
-    try { sessionStorage.setItem('glyde-dock', 'closed'); } catch (err) { /* storage blocked */ }
-    updateDock();
-  });
-  new IntersectionObserver(entries => {
-    getInView = entries[entries.length - 1].isIntersecting;
-    updateDock();
-  }).observe($('#get'));
-
-  function updateDock() {
-    const nearEnd = scrollY + innerHeight > document.documentElement.scrollHeight - 160;
-    const pastStory = storyLine ? storyLine.getBoundingClientRect().bottom < innerHeight * 0.6 : scrollY > innerHeight * 1.1;
-    dock.classList.toggle('show', !dockClosed && !joined && !getInView && !nearEnd && pastStory);
-  }
 
   // ---- Fit every island to the room it has ----------------------------------------------------
 
@@ -1082,7 +682,6 @@
     });
     const navScale = Math.min(1, (innerWidth - 24) / 430);
     $('#nav-island').style.setProperty('--s', navScale.toFixed(3));
-    hint.style.setProperty('--hint-s', $('#hero-island').style.getPropertyValue('--s') || 1.45);
   }
   fitIslands();
   addEventListener('resize', fitIslands);
@@ -1090,24 +689,39 @@
   // ---- Scroll: top bar, hero tilt, progress ring -------------------------------------------------
 
   const screenWrap = $('.hero .screen-wrap');
-  const scrollCue = $('.scroll-cue');
   let wasTop = true;
+  let lastTilt = -1;
   let scrollQueued = false;
+  // Near the top or not (the island shows the time up there): told by an observer when the line is crossed, so
+  // nothing reads the scroll position while you scroll.
+  const topLine = document.createElement('div');
+  topLine.setAttribute('aria-hidden', 'true');
+  topLine.style.cssText = 'position:absolute;left:0;top:0;width:1px;height:140px;pointer-events:none;visibility:hidden';
+  document.body.prepend(topLine);
+  new IntersectionObserver(([entry]) => {
+    const atTop = entry.isIntersecting;
+    if (atTop !== wasTop) { wasTop = atTop; nav.refresh(); }
+  }).observe(topLine);
+
+  // The bar's backdrop, the hero screen's tilt and the island's progress ring follow the scroll from CSS where the
+  // browser can (scroll-driven animations, in site.css); elsewhere, here, once a frame.
   function onScroll() {
     scrollQueued = false;
-    const y = scrollY;
+    const y = lastY;
     topbar.classList.toggle('scrolled', y > 20);
-    if (!reduceMotion) screenWrap.style.setProperty('--tilt', Math.max(0, 16 - y / 24).toFixed(2));
-    const atTop = y < 140;
-    if (atTop !== wasTop) { wasTop = atTop; nav.refresh(); }
+    const tilt = reduceMotion ? 0 : Math.max(0, 16 - y / 24);
+    if (tilt !== lastTilt) { lastTilt = tilt; screenWrap.style.setProperty('--tilt', tilt.toFixed(2)); }
     const ring = navIsland.currentEl && navIsland.currentEl.querySelector('.ring-fg');
-    if (ring) ring.style.strokeDashoffset = (100 - scrollProgress() * 100).toFixed(1);
-    scrollCue.classList.toggle('gone', y > 60);
-    updateStoryLine();
-    updateDock();
+    if (ring) ring.style.strokeDashoffset = (100 - Math.min(1, y / Math.max(1, pageHeight - innerHeight)) * 100).toFixed(1);
   }
-  addEventListener('scroll', () => { if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(onScroll); } }, { passive: true });
-  onScroll();
+  let lastY = scrollY, pageHeight = document.documentElement.scrollHeight;
+  if (!scrollDriven) {
+    new ResizeObserver(() => { pageHeight = document.documentElement.scrollHeight; }).observe(document.body);
+    addEventListener('scroll', () => { lastY = scrollY; if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(onScroll); } }, { passive: true });
+    onScroll();
+  } else {
+    topbar.classList.add('scrolled'); // (its backdrop then fades in with the scroll, from CSS)
+  }
 
   // ---- Reveal on scroll, card spotlight ------------------------------------------------------
 
@@ -1131,86 +745,6 @@
     });
   });
 
-  // ---- Motes of light drifting up the page ---------------------------------------------------
-  // Only while the hero or the final call is on screen (fading out in between), and never while paused.
-
-  (function motes() {
-    const canvas = $('#motes');
-    if (reduceMotion || !canvas.getContext) { canvas.remove(); return; }
-    const ctx = canvas.getContext('2d');
-
-    // One soft glowing dot, drawn once and stamped everywhere.
-    const sprite = document.createElement('canvas');
-    sprite.width = sprite.height = 64;
-    const s = sprite.getContext('2d');
-    const glow = s.createRadialGradient(32, 32, 0, 32, 32, 32);
-    glow.addColorStop(0, 'rgba(255,250,230,1)');
-    glow.addColorStop(0.25, 'rgba(255,222,150,.75)');
-    glow.addColorStop(1, 'rgba(255,214,140,0)');
-    s.fillStyle = glow;
-    s.fillRect(0, 0, 64, 64);
-
-    let width = 0, height = 0, list = [], raf = 0, last = performance.now();
-    const spawn = anywhere => ({
-      x: Math.random() * width,
-      y: anywhere ? Math.random() * height : height + 20,
-      size: 6 + Math.random() * 14,
-      speed: 8 + Math.random() * 18,
-      sway: Math.random() * Math.PI * 2,
-      twinkle: Math.random() * Math.PI * 2,
-      alpha: 0.25 + Math.random() * 0.5,
-    });
-
-    function resize() {
-      const dpr = Math.min(2, devicePixelRatio || 1);
-      width = innerWidth;
-      height = innerHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = width + 'px';
-      canvas.style.height = height + 'px';
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.min(70, Math.round(width * height / 24000));
-      while (list.length < count) list.push(spawn(true));
-      list.length = count;
-    }
-
-    function frame(now) {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
-      ctx.clearRect(0, 0, width, height);
-      for (const m of list) {
-        m.y -= m.speed * dt;
-        m.sway += dt * 0.7;
-        m.twinkle += dt * 2.2;
-        if (m.y < -30) Object.assign(m, spawn(false));
-        ctx.globalAlpha = m.alpha * (0.55 + 0.45 * Math.sin(m.twinkle));
-        ctx.drawImage(sprite, m.x + Math.sin(m.sway) * 16 - m.size / 2, m.y - m.size / 2, m.size, m.size);
-      }
-      raf = requestAnimationFrame(frame);
-    }
-
-    const showing = new Set();
-    function update() {
-      const on = showing.size > 0 && !still && !document.hidden;
-      canvas.classList.toggle('off', !on);
-      if (on && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
-      if (!on && raf) { cancelAnimationFrame(raf); raf = 0; }
-    }
-    new IntersectionObserver(entries => {
-      entries.forEach(entry => { if (entry.isIntersecting) showing.add(entry.target); else showing.delete(entry.target); });
-      update();
-    }).observe($('.hero'));
-    new IntersectionObserver(entries => {
-      entries.forEach(entry => { if (entry.isIntersecting) showing.add(entry.target); else showing.delete(entry.target); });
-      update();
-    }).observe($('.final'));
-
-    resize();
-    addEventListener('resize', resize);
-    document.addEventListener('visibilitychange', update);
-    whenStillChanges.push(update);
-  })();
 
   setStill(still, false); // (as left last time)
 })();

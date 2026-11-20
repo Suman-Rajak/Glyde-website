@@ -179,7 +179,7 @@
     caption.textContent = data.said.join(' ');
   }
 
-  tabs.forEach(tab => tab.addEventListener('click', () => (reduce ? still(tab.dataset.scene) : play(tab.dataset.scene, true))));
+  tabs.forEach(tab => tab.addEventListener('click', () => (reduce || document.documentElement.classList.contains('still') ? still(tab.dataset.scene) : play(tab.dataset.scene, true))));
   $('.pa-tabs').addEventListener('keydown', e => {
     const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
     if (!step) return;
@@ -192,8 +192,13 @@
 
   if (reduce) { still('photo'); return; }
   reset('photo');
+  const paused = () => document.documentElement.classList.contains('still');
+  document.addEventListener('glyde:still', e => {
+    if (e.detail) { token++; still(scene); } else if (visible) play(scene, true);
+  });
   new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
+    if (visible && paused()) { still(scene); return; }
     if (visible && (!played || replay.hidden === false)) play(scene, true);
     if (!visible) { token++; pointer.classList.remove('on'); }
   }, { threshold: 0.35 }).observe(stage);

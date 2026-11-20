@@ -18,5 +18,9 @@ window.WINISLAND = {
 
   // The Google Apps Script web app that saves waitlist emails to your Google Sheet
   // (see apps-script/README.md). It ends in /exec. Empty: emails aren't sent anywhere.
+  // Real quotes from people who use Glyde: { text: '…', name: '…', role: '…', url: '…' } (role and url
+  // optional). The quotes section stays hidden while this list is empty; never put made-up ones here.
+  quotes: [],
+
   waitlistUrl: 'https://script.google.com/macros/s/AKfycbyMwc_2HmANndP8kuBXSW6OuG0EB1rP_zpeNDFC4zWktIMr9Fs4Ao-jfbLT9slhBE7a/exec',
 };

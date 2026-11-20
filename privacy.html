@@ -4,44 +4,54 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy policy · Glyde</title>
-  <meta name="description" content="What Glyde, the voice island for Windows, keeps on your PC, what it sends online and to whom, and what this website keeps.">
-  <meta name="theme-color" content="#e9e2ff">
+  <meta name="description" content="What Glyde keeps on your PC, what it sends online and to whom, and what this website keeps.">
+  <link rel="canonical" href="https://suman-rajak.github.io/Glyde-website/privacy.html">
+  <meta name="theme-color" content="#07061a">
+  <meta property="og:site_name" content="Glyde">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://suman-rajak.github.io/Glyde-website/privacy.html">
+  <meta property="og:title" content="Privacy policy · Glyde">
+  <meta property="og:description" content="What Glyde keeps on your PC, what it sends online and to whom, and what this website keeps.">
+  <meta property="og:image" content="https://suman-rajak.github.io/Glyde-website/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Glyde: the dynamic island for Windows.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Privacy policy · Glyde">
+  <meta name="twitter:description" content="What Glyde keeps on your PC, what it sends online and to whom, and what this website keeps.">
+  <meta name="twitter:image" content="https://suman-rajak.github.io/Glyde-website/og-image.jpg">
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    /* The policy: one column of reading, on the site's paper, under a plain bar with the brand. */
-    .policy-bar { display: flex; align-items: center; justify-content: space-between; max-width: 760px; margin: 0 auto; padding: 22px var(--gutter); }
-    .policy { max-width: 760px; margin: 0 auto; padding: 24px var(--gutter) 80px; }
-    .policy h1 { font-size: clamp(40px, 6vw, 60px); margin: 18px 0 10px; }
-    .policy h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; }
-    .policy .updated { color: var(--ink-3); font-size: 14px; }
-    .policy .summary { margin: 30px 0 8px; padding: 20px 24px; border-radius: 18px; background: #fff; box-shadow: var(--shadow-soft); }
-    .policy .summary p + p { margin-top: 8px; }
-    .policy h2 { font-size: 24px; letter-spacing: -.02em; margin: 44px 0 12px; }
-    .policy h3 { font-size: 17px; letter-spacing: -.01em; margin: 26px 0 8px; }
-    .policy p, .policy li { color: var(--ink-2); }
-    .policy p + p { margin-top: 12px; }
-    .policy ul { margin: 10px 0 0; padding-left: 20px; }
-    .policy li + li { margin-top: 8px; }
-    .policy strong { color: var(--ink); font-weight: 600; }
-    .policy a { color: var(--ink); text-underline-offset: 3px; }
-    .policy table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 15px; }
-    .policy th, .policy td { text-align: left; vertical-align: top; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); }
-    .policy th { color: var(--ink); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
-    @media (max-width: 560px) { .policy table, .policy thead, .policy tbody, .policy tr, .policy th, .policy td { display: block; } .policy thead { display: none; } .policy td { border: 0; padding: 2px 0; } .policy tr { padding: 12px 0; border-bottom: 1px solid var(--line); } .policy td:first-child { color: var(--ink); font-weight: 600; } }
-  </style>
+  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="pages.css">
+  <script defer src="smooth.js"></script>
 </head>
 <body>
-  <header class="policy-bar">
-    <a class="brand" href="./">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-name">Glyde</span>
-    </a>
-    <a class="btn btn-dark btn-sm" href="./">Back to Glyde</a>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="doc-dots" aria-hidden="true"></div>
+
+  <header class="topbar on-night">
+    <div class="tb-side">
+      <a class="brand" href="./" aria-label="Glyde home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">Glyde</span>
+      </a>
+      <nav class="tb-links" aria-label="Main">
+        <a href="./#features">Features</a>
+        <a href="./#point">Point &amp; Ask</a>
+        <a href="./#pricing">Pricing</a>
+      </nav>
+    </div>
+    <div class="tb-side right">
+      <nav class="tb-links always" aria-label="More">
+        <a href="./#faq">FAQ</a>
+        <a href="changelog.html">Changelog</a>
+      </nav>
+      <a class="btn btn-dark btn-sm" href="./#get">Join the waitlist</a>
+    </div>
   </header>
 
-  <main class="policy">
+  <main class="doc" id="main">
     <h1>Privacy policy</h1>
     <p class="updated">Last updated 30 October 2026. This covers the Glyde app for Windows, Glyde Cloud (its server for Glyde AI), and this website. Glyde AI is coming soon: until it's out, nothing marked Glyde AI below is sent anywhere.</p>
 
@@ -106,13 +116,22 @@
       <a class="brand" href="./"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">Glyde</span></a>
       <nav aria-label="Footer">
         <a href="./#features">Features</a>
-        <a href="./#privacy">Privacy</a>
         <a href="./#pricing">Pricing</a>
         <a href="./#faq">FAQ</a>
         <a href="changelog.html">Changelog</a>
+        <a href="privacy.html">Privacy policy</a>
+        <a href="terms.html">Terms</a>
       </nav>
       <p class="fine">© 2026 Glyde. An independent app, not affiliated with Apple Inc., Microsoft Corporation or Google LLC.</p>
     </div>
   </footer>
+  <script>
+    // The bar gets its backdrop once you scroll.
+    (function () {
+      var bar = document.querySelector('.topbar');
+      var update = function () { bar.classList.toggle('scrolled', scrollY > 20); };
+      addEventListener('scroll', update, { passive: true }); update();
+    })();
+  </script>
 </body>
 </html>

@@ -4,19 +4,28 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Glyde · The dynamic island for Windows</title>
-  <meta name="description" content="Glyde is a voice island for Windows: a living island at the top of your screen for music and lyrics, messages, calls, timers, and your clipboard, with an assistant that answers to “Hey Glyde”.">
-  <meta name="theme-color" content="#e9e2ff">
-  <meta property="og:title" content="Glyde · The dynamic island for Windows">
-  <meta property="og:description" content="A voice island for Windows: music and lyrics, messages, timers and your clipboard, and an assistant that answers to “Hey Glyde”. Coming soon for Windows 10 and 11.">
+  <meta name="description" content="Glyde is the dynamic island for Windows: music with lyrics, calls, timers, downloads and your coding agents at the top of your screen, and an assistant that answers to “Hey Glyde”. Free for Windows 10 and 11.">
+  <link rel="canonical" href="https://suman-rajak.github.io/Glyde-website/">
+  <meta name="theme-color" content="#07061a">
+  <meta property="og:site_name" content="Glyde">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="apple-touch-icon.png">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:url" content="https://suman-rajak.github.io/Glyde-website/">
+  <meta property="og:title" content="Glyde · The dynamic island for Windows">
+  <meta property="og:description" content="Glyde is the dynamic island for Windows: music with lyrics, calls, timers, downloads and your coding agents at the top of your screen, and an assistant that answers to “Hey Glyde”. Free for Windows 10 and 11.">
+  <meta property="og:image" content="https://suman-rajak.github.io/Glyde-website/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Glyde: the dynamic island for Windows.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Glyde · The dynamic island for Windows">
+  <meta name="twitter:description" content="Glyde is the dynamic island for Windows: music with lyrics, calls, timers, downloads and your coding agents at the top of your screen, and an assistant that answers to “Hey Glyde”. Free for Windows 10 and 11.">
+  <meta name="twitter:image" content="https://suman-rajak.github.io/Glyde-website/og-image.jpg">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Glyde", "description": "The dynamic island for Windows.", "url": "https://suman-rajak.github.io/Glyde-website/", "image": "https://suman-rajak.github.io/Glyde-website/og-image.jpg", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Windows 10, Windows 11", "offers": [{"@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "INR", "availability": "https://schema.org/PreOrder"}, {"@type": "Offer", "name": "Glyde Pro", "price": "699", "priceCurrency": "INR", "availability": "https://schema.org/PreOrder"}]}</script>
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="preload" href="fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="polish.css">
+  <link rel="stylesheet" href="site.css">
   <script>document.documentElement.classList.add('js');</script>
+  <script defer src="smooth.js"></script>
   <script defer src="config.js"></script>
   <script defer src="island.js"></script>
   <script defer src="main.js"></script>
@@ -28,7 +37,6 @@
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
-  <canvas id="motes" aria-hidden="true"></canvas>
 
   <!-- The menu is an island too: it shows where you are, and opens into the sections on hover. -->
   <header class="topbar">
@@ -60,9 +68,7 @@
     <!-- ============================== HERO ============================== -->
     <section class="hero" id="top" data-section="Glyde">
       <div class="hero-sky" aria-hidden="true">
-        <div class="rays"></div>
         <div class="halo"></div>
-        <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="cloud c4"></div>
       </div>
 
       <div class="hero-inner">
@@ -89,17 +95,15 @@
 
       <div class="screen-wrap reveal" style="--d:.7s">
         <div class="screen" id="hero-screen">
+              <button class="demo-pause" type="button" data-motion-toggle aria-pressed="false"><span class="dp-ic" aria-hidden="true"></span><span class="mt-label sr-only">Pause animations</span></button>
           <div class="display">
             <div class="wallpaper" aria-hidden="true">
-              <div class="wp-sun"></div>
-              <div class="wp-cloud a"></div><div class="wp-cloud b"></div><div class="wp-cloud c"></div><div class="wp-cloud d"></div>
             </div>
             <div class="desk-window" aria-hidden="true">
               <div class="dw-bar"><i></i><i></i><i></i></div>
               <div class="dw-body"><b></b><span></span><span></span><span class="short"></span><span></span><span class="short"></span></div>
             </div>
             <div class="island-slot"><div id="hero-island" class="halo-glow" style="--h:250" data-max="1.45"></div></div>
-            <p class="hover-hint" aria-hidden="true"><span class="hh-cursor"></span>Hover the island</p>
             <div class="taskbar" aria-hidden="true">
               <div class="tb-apps"><i class="tb-start"></i><i class="tb-search"></i><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="a4"></i></div>
               <div class="tb-clock"><b data-clock-time></b><span data-clock-date></span></div>
@@ -107,19 +111,6 @@
           </div>
         </div>
       </div>
-
-      <div class="try reveal" role="group" aria-label="Try an activity on the island">
-        <span class="try-label">Try it</span>
-        <button class="chip" data-demo="music"><span class="chip-ic" data-icon="note"></span>Music</button>
-        <button class="chip" data-demo="notification"><span class="chip-ic" data-icon="bell"></span>Message</button>
-        <button class="chip" data-demo="volume"><span class="chip-ic" data-icon="volume"></span>Volume</button>
-        <button class="chip" data-demo="bluetooth"><span class="chip-ic" data-icon="headphones"></span>Earbuds</button>
-        <button class="chip" data-demo="battery"><span class="chip-ic" data-icon="bolt"></span>Charging</button>
-        <button class="chip" data-demo="privacy"><span class="chip-ic" data-icon="mic"></span>Mic in use</button>
-        <button class="chip" data-demo="timer"><span class="chip-ic" data-icon="stopwatch"></span>Timer</button>
-        <button class="chip chip-siro" data-demo="siro"><span class="chip-ic" data-icon="sparkle"></span>Hey&nbsp;Glyde</button>
-      </div>
-      <a class="scroll-cue" href="#why"><span class="mouse" aria-hidden="true"></span>Scroll to watch it come alive</a>
     </section>
 
     <!-- ============================== FEATURES ============================== -->
@@ -168,6 +159,7 @@
           </div>
           <div class="fx-stage">
             <div class="screen fx-device">
+              <button class="demo-pause" type="button" data-motion-toggle aria-pressed="false"><span class="dp-ic" aria-hidden="true"></span><span class="mt-label sr-only">Pause animations</span></button>
               <div class="display fx-screen">
                 <div class="fx-menubar" aria-hidden="true"><b>Glyde</b><span>File</span><span>Edit</span><span>View</span><span>Window</span><i class="fx-mb-right"><span>Wi-Fi</span><span>100%</span><span>Mon 16 Nov  12:40</span></i></div>
                 <div class="fx-search" aria-hidden="true"><div class="fx-search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span>budget</span></div><div class="fx-search-row on"><i></i><span><b>Trip budget.xlsx</b><small>Documents</small></span></div><div class="fx-search-row"><i class="app"></i><span><b>Calculator</b><small>App</small></span></div><div class="fx-search-row"><i class="sum"></i><span><b>2,400 + 3,600 = 6,000</b><small>Sum</small></span></div></div>
@@ -227,11 +219,6 @@
           <button class="say" data-say="help">“What can you do?”</button>
         </div>
 
-        <div class="voice-try reveal">
-          <button class="voice-btn" id="voice-btn" aria-pressed="false"><span class="vb-dot"></span><span class="vb-label">Try it with your voice</span></button>
-          <p class="micro">Only loudness is measured, in your browser. Nothing is recorded or sent.</p>
-        </div>
-
         <div class="facts">
           <div class="fact reveal"><b>On-device</b><p>Your voice becomes text on your PC, on your graphics card when there is one. Recordings never leave it.</p></div>
           <div class="fact reveal" style="--d:.08s"><b>~0.2 s</b><p>to check whether you said “Hey&nbsp;Glyde”. Only the first two seconds after a pause are checked.</p></div>
@@ -276,6 +263,7 @@
 
         <div class="pa reveal" id="pa-stage" role="tabpanel" aria-labelledby="pa-tab-photo">
           <div class="screen pa-device">
+              <button class="demo-pause" type="button" data-motion-toggle aria-pressed="false"><span class="dp-ic" aria-hidden="true"></span><span class="mt-label sr-only">Pause animations</span></button>
             <div class="display pa-screen" data-scene="photo">
 
               <!-- the apps, in a 1000 x 600 space so the marks line up at any size -->
@@ -408,6 +396,7 @@
         </div>
         <div class="bc reveal">
           <div class="screen bc-device">
+              <button class="demo-pause" type="button" data-motion-toggle aria-pressed="false"><span class="dp-ic" aria-hidden="true"></span><span class="mt-label sr-only">Pause animations</span></button>
             <div class="display bc-screen">
               <div class="bc-win" aria-hidden="true">
                 <div class="bc-tabs"><span class="bc-tab on"><i></i>Skyfare · Flights</span><span class="bc-tab"><i class="g"></i>Inbox</span></div>
@@ -455,6 +444,14 @@
         </div>
       </section>
     </div>
+
+    <!-- ============================== QUOTES (hidden until config.js has real ones) ============================== -->
+    <section class="quotes" id="quotes" aria-labelledby="quotes-title" hidden>
+      <div class="section-head center reveal">
+        <h2 id="quotes-title">In their <span class="soft">own words.</span></h2>
+      </div>
+      <div class="quote-list"></div>
+    </section>
 
     <!-- ============================== PRICING ============================== -->
     <section class="pricing" id="pricing" data-section="Pricing">
@@ -609,11 +606,12 @@
         <div class="letter-head">
           <span class="signer-mark" aria-hidden="true">S</span>
           <div>
-            <h2 class="letter-title" id="founder-title">Why I'm building Glyde</h2>
+            <h2 class="letter-title" id="founder-title">Why I’m building Glyde</h2>
           </div>
         </div>
-        <p>Our phones tell us more at a glance than the computers we spend all day on. Windows deserves better: a calm, well-made place for what's happening right now, and an assistant that respects your privacy.</p>
-        <p>Glyde is built on three principles: feel native and fast, stay out of your way, and treat your data with care. Thank you for being here early.</p>
+        <p>I spend my days on a Windows laptop, and my phone always seemed to know more about what was going on than my computer did.</p>
+        <p>So in October I started building what I wanted: a small place at the top of the screen for whatever’s happening right now. It began as WinIsland, a notch for my own screen, and grew into Glyde.</p>
+        <p>I use it every day. If something bugs you, or there’s something you wish it did, tell me.</p>
         <footer class="letter-sign">
           <span class="sig" aria-hidden="true">Suman</span>
           <span class="signer-name"><b>Suman</b><small>Founder, Glyde</small></span>
@@ -624,7 +622,6 @@
     <!-- ============================== GET WINISLAND ============================== -->
     <section class="final" id="get" data-section="Get Glyde">
       <div class="final-sky" aria-hidden="true">
-        <div class="rays soft"></div>
         <div class="halo-ring r1"></div><div class="halo-ring r2"></div><div class="halo-ring r3"></div><div class="halo-ring r4"></div>
       </div>
       <div class="final-inner">
@@ -663,13 +660,6 @@
     </section>
   </main>
 
-  <aside class="dock" aria-label="Get Glyde" hidden>
-    <span class="dock-mark" aria-hidden="true"></span>
-    <span class="dock-text"><b>Glyde</b><small data-dock-note>Coming soon for Windows</small></span>
-    <a class="btn btn-glow btn-sm" href="#get" data-dock-cta><span class="long">Join the waitlist</span><span class="short">Join</span></a>
-    <button class="dock-x" type="button" aria-label="Hide this">&times;</button>
-  </aside>
-
   <footer class="footer">
     <div class="footer-inner">
       <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">Glyde</span></a>
@@ -677,13 +667,13 @@
         <a href="#features">Features</a>
         <a href="#voice">Voice</a>
         <a href="#point">Point &amp; Ask</a>
-        <a href="#privacy">Privacy</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
         <a href="#get" data-download>Download</a>
         <a href="#get" data-store>Microsoft Store</a>
         <a href="changelog.html">Changelog</a>
         <a href="privacy.html">Privacy policy</a>
+        <a href="terms.html">Terms</a>
         <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false">Pause animations</button>
       </nav>
       <p class="fine">© <span data-year>2026</span> Glyde. An independent app, not affiliated with Apple Inc., Microsoft Corporation or Google LLC. Glyde was formerly called WinIsland. Song titles, artists and people on this page are made up.</p>

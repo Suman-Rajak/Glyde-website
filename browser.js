@@ -103,6 +103,19 @@
     } catch (err) { /* stopped: off screen, or a newer run */ }
   }
 
+  function finished() {
+    $('.bc-typed').textContent = 'Goa';
+    $('.bc-date').textContent = 'Fri, 20 Nov';
+    screen.classList.add('searched', 'sorted', 'found');
+    screen.classList.remove('working');
+    pointer.classList.remove('on');
+    island.show(V.siroAnswer(ASKED, ANSWER));
+    caption.textContent = ANSWER;
+  }
+  const paused = () => document.documentElement.classList.contains('still');
+  document.addEventListener('glyde:still', e => {
+    if (e.detail) { token++; finished(); } else if (visible) run();
+  });
   if (reduce) {
     $('.bc-typed').textContent = 'Goa';
     $('.bc-date').textContent = 'Fri, 20 Nov';
@@ -113,6 +126,7 @@
   }
   new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
+    if (visible && paused()) { finished(); return; }
     if (visible) run(); else { token++; reset(); }
   }, { threshold: 0.35 }).observe(screen);
 })();
