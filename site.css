@@ -1630,22 +1630,13 @@ body::after {
     radial-gradient(54% 40% at 50% 0%, rgba(124, 108, 255, .42), transparent 72%),
     radial-gradient(30% 26% at 84% 30%, rgba(242, 181, 68, .12), transparent 70%),
     radial-gradient(36% 32% at 10% 50%, rgba(70, 120, 255, .16), transparent 70%),
-    radial-gradient(62% 56% at 50% 30%, rgba(10, 9, 33, 0) 18%, #0a0921 76%),
-    radial-gradient(circle at center, rgba(200, 190, 255, .3) 1.1px, transparent 1.7000000000000002px) center top / 24px 24px,
+    radial-gradient(720px 440px at 50% 300px, rgba(10, 9, 33, 0), rgba(10, 9, 33, .7) 55%, #0a0921 100%),
+    radial-gradient(circle at center, rgba(200, 190, 255, .16) .9px, transparent 1.4px) center top / 32px 32px,
     linear-gradient(180deg, #0a0920 0%, #0b0a24 70%, #090820 100%);
 }
 .hero::after { background: radial-gradient(520px circle at var(--cx, 50%) var(--cy, 30%), rgba(160, 145, 255, .12), transparent 60%); }
 
-.hero-sky::before { content: none; }
-.hero-sky::after {
-  /* fine rings of light behind the title: the halo, drawn as an instrument would */
-  content: ""; position: absolute; left: 50%; top: 250px; width: min(980px, 130vw); aspect-ratio: 1;
-  translate: -50% -50%; border-radius: 50%;
-  background:
-    radial-gradient(closest-side, transparent 63.5%, rgba(169, 156, 255, .22) 64%, transparent 64.6%),
-    radial-gradient(closest-side, transparent 81.5%, rgba(169, 156, 255, .12) 82%, transparent 82.6%),
-    radial-gradient(closest-side, transparent 97.5%, rgba(169, 156, 255, .08) 98%, transparent 98.6%);
-}
+.hero-sky::before, .hero-sky::after { content: none; }
 .hero-sky .halo { opacity: .35; mix-blend-mode: screen; }
 .hero h1, .hero-title { color: #fff; }
 
@@ -1674,7 +1665,7 @@ body::after {
     radial-gradient(40% 40% at 55% 105%, rgba(255, 140, 170, .38), transparent 70%),
     linear-gradient(160deg, #2a2366, #15123a 70%) !important;
 }
-.wallpaper::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(255, 255, 255, .1) 1px, transparent 1.6px) center top / 18px 18px; }
+.wallpaper::after { content: none; }
 
 .desk-window { background: rgba(26, 22, 60, .78) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 20px 40px -16px rgba(0, 0, 0, .55) !important; }
 .desk-window .dw-bar { background: rgba(255, 255, 255, .05) !important; }
@@ -1690,7 +1681,7 @@ body::after {
     linear-gradient(180deg, #1b1745, #100e2a) !important;
   isolation: isolate;
 }
-.card-screen::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(circle at center, rgba(255, 255, 255, .09) 1px, transparent 1.6px) center top / 16px 16px; }
+.card-screen::before { content: none; }
 
 .card { box-shadow: 0 0 0 1px rgba(20, 18, 60, .06), 0 18px 40px -24px rgba(40, 30, 120, .35) !important; }
 
@@ -1698,8 +1689,7 @@ body::after {
 
 /* ---- the night: stars become a slow dot matrix ---- */
 .night { isolation: isolate; }
-.night::before { content: ""; position: absolute; left: 0; right: 0; top: 520px; bottom: 520px; z-index: -1; pointer-events: none; opacity: .55;
-  background: linear-gradient(180deg, var(--night) 0, rgba(8, 10, 28, 0) 160px, rgba(8, 10, 28, 0) calc(100% - 160px), var(--night) 100%), radial-gradient(circle at center, rgba(200, 190, 255, .4) 1.1px, transparent 1.7000000000000002px) center top / 26px 26px; }
+.night::before { content: none; }
 .stars { opacity: .5; }
 .aurora { opacity: .42; }
 
@@ -2199,7 +2189,7 @@ body::after {
 .fx-list[hidden] { display: none !important; }
 .features .section-head h2 { font-size: clamp(2.1rem, 4.2vw, 3.4rem); }
 .fx-screen { background: radial-gradient(60% 70% at 78% 30%, rgba(160, 110, 255, .5), transparent 70%), radial-gradient(55% 60% at 16% 85%, rgba(70, 130, 255, .4), transparent 70%), linear-gradient(160deg, #2a2366, #141238 70%); }
-.fx-screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at center, rgba(255, 255, 255, .08) 1px, transparent 1.6px) center top / 18px 18px; }
+.fx-screen::after { content: none; }
 
 /* ============================== BROWSER CONTROL ============================== */
 .browser { position: relative; padding: 120px var(--gutter) 40px; }
@@ -2299,7 +2289,7 @@ h2 em, h1 em, .lede em { font-family: inherit; font-style: normal; font-weight: 
 .signer-mark::before { display: none; }
 
 /* The last call, dark like the top of the page, so the page opens and closes the same way. */
-.final { background: radial-gradient(54% 50% at 50% 18%, rgba(124, 108, 255, .34), transparent 72%), radial-gradient(46% 50% at 50% 30%, rgba(10, 9, 33, 0) 15%, #0a0921 72%), radial-gradient(circle at center, rgba(200, 190, 255, .26) 1.1px, transparent 1.7000000000000002px) center top / 22px 22px, linear-gradient(180deg, #0b0a24, #07061a 80%); color: #f2f0ff; --focus: #fff; }
+.final { background: radial-gradient(54% 50% at 50% 18%, rgba(124, 108, 255, .34), transparent 72%), linear-gradient(180deg, #0b0a24, #07061a 80%); color: #f2f0ff; --focus: #fff; }
 
 .final .halo-ring { border-color: rgba(169, 156, 255, .2) !important; }
 .final h2 { color: #fff; }
@@ -2330,7 +2320,8 @@ h2 em, h1 em, .lede em { font-family: inherit; font-style: normal; font-weight: 
 
 /* The wordmark's tight tracking lets the last letter reach past its box, and a gradient clipped to the text only
    paints inside the box: room on both sides keeps the whole "e" (and the "G") painted. */
-.wm-text { padding: 0 .1em; margin: 0 -.1em; }
+/* (room above and below, so the fill reaches the y's tail and the l's top: a gradient clipped to text paints only inside the box) */
+.wm-text { padding: .06em .1em .24em; margin: -.06em -.1em -.24em; }
 
 /* ============================== SMOOTHNESS ============================== */
 /* each island's own layout stays its own */
